@@ -43,3 +43,14 @@ const STATUSES = {
   "under-revision": { label: "under revision", closed: false },
   "complete":       { label: "complete",       closed: true }
 };
+
+/* Proposals for broad directions that a later cycle of the list could be organized around. */
+const FUTURE_GOALS = [
+  {
+    title: "Challenges to the program",
+    proposedBy: [],
+    date: "2026-10-04",
+    summary: "A direction for work that questions the assumptions behind generalized noncontextuality itself, rather than working within them.",
+    description: tex`The companion paper plans a part of the agenda dedicated to challenges to the field: responses to the noncontextuality no-go theorem that abandon some of its assumptions and propose new ones, that keep Leibniz's principle while reformulating the mathematical framework, or that restructure both the arena and the principle at once. Collecting such work under an explicit heading would make the agenda easier to contest and would give near-term problems that probe the framework's limits a place to trace back to. This entry is a placeholder to be developed by whoever takes it up.`
+  }
+];
