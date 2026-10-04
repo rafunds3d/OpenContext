@@ -28,8 +28,8 @@ function viewHome() {
   </form>
   <p class="hint">Press <kbd>/</kbd> to start typing. ${latest() ? 'Last update ' + fmtDate(latest()) + '.' : ''}</p>
 
-  <h2 class="sec-title">I. Research agenda</h2>
-  <p class="muted small" style="text-align:center;margin-top:-.4rem">Three long-term goals organize the field; every problem traces back to at least one of them. Golden apples mark goals, red apples the near-term problems that grow from them.</p>
+  <h2 class="sec-title">I. Organizing research goals</h2>
+  <p class="muted small" style="text-align:center;margin-top:-.4rem">For this first cycle, ${esc(SITE.edition || SITE.name)}, three long-term goals organize the list. The division is a matter of organization rather than a verdict on what is worth pursuing; every problem traces back to at least one goal. Golden apples mark goals, red apples the near-term problems that grow from them. Later cycles may be organized around other broad directions, which anyone can propose on the <a href="#/future-goals">future broad goals</a> page.</p>
   <ol class="goals">${GOALS.map(g => `<li class="goal">
     <span class="goal-num">${apple('apple-goal')}${g.numeral}.</span>
     <span class="goal-title"><a href="#/agenda?to=${g.id}">${esc(g.title)}</a></span>
