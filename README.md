@@ -1,10 +1,12 @@
 # OpenContext
 
-A community-curated, open database of near-term problems in generalized contextuality, each traceable to a long-term goal of the field's research agenda. It is the proof-of-concept database of the perspective *Accelerating research through skilled humans collaborating with AI agents: A case study in quantum foundations*, and it is styled after that paper.
+A community-curated, open database of near-term problems in generalized contextuality, each traceable to a long-term goal of the field's research agenda. It is the proof-of-concept database of the perspective *Accelerating research through skilled humans collaborating with AI agents: A case study in quantum foundations*.
 
-The site is plain HTML, CSS and JavaScript with no build step. Open `index.html` in a browser and it runs; push it to GitHub and GitHub Pages serves it.
+This is a simple website specifically designed for the case-study, dubbed OpenContext I. Future work will gather new problems for OpenContex II as well as an analysis of organization (and other) issues.
 
-## Where things live
+This website was constructed with substantial help of Fable 5.1. 
+
+## Website structure
 
 ```
 index.html          the page shell: head, header, footer, the apple icon, the list of scripts
@@ -18,8 +20,6 @@ pages/agenda.js       pages/tags.js   pages/about.js    pages/contribute.js
 js/lib.js           shared pieces: apples, status labels, rows, the red and tan boxes, templates
 js/router.js        turns #/problems, #/problem/3, … into calls of the page functions; loaded last
 ```
-
-Scripts are loaded in the order listed in `index.html`: data first, then `js/lib.js`, then the pages, then the router. A new file only needs a `<script>` tag in that list.
 
 ## Editing
 
