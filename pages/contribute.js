@@ -12,6 +12,7 @@ function viewContribute() {
   ${criteriaBox()}
   <p>To propose one, add an entry to the <code>PROBLEMS</code> list using this template, with yourself as poser and today's date, and open a pull request${SITE.contact ? ` or send it to <a href="mailto:${esc(SITE.contact)}">${esc(SITE.contact)}</a>` : ''}:</p>
   <pre>${esc(problemTemplate())}</pre>
+  <p class="small">A broad direction for the field, rather than a single problem, is proposed on the <a href="#/future-goals">future broad goals</a> page.</p>
 
   <h2 class="sec-title" id="advance">B. Report progress</h2>
   <p>Attempted solutions, partial or negative results, reformulations, computational evidence, and questions about a statement's scope go into the problem's history. Submissions need not be complete or rigorous: say explicitly when material is provisional, and say when and how AI tools were used. Add an entry like this to the problem's <code>history</code> list, newest at the bottom:</p>
