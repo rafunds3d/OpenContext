@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ffffff">
+<meta name="description" content="OpenContext: a community-curated, open database of precisely stated near-term problems in generalized contextuality, each traceable to a long-term goal of the field's research agenda.">
+<title>OpenContext</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23c00808' d='M12 8.6C10.8 7.4 9.2 6.8 7.6 7 4.4 7.4 2.6 10.6 3.3 14.4 4 18.5 6.6 21.4 8.6 21.4c1 0 2-.6 3.4-.6s2.4.6 3.4.6c2 0 4.6-2.9 5.3-7 .7-3.8-1.1-7-4.3-7.4-1.6-.2-3.2.4-4.4 1.6z'/%3E%3Cpath fill='none' stroke='%235a3a1a' stroke-width='1.7' stroke-linecap='round' d='M12 8.6c0-1.8.6-3.4 1.8-4.6'/%3E%3Cpath fill='%233f8f3f' d='M13 6.6c.4-2 2.2-3.1 4.4-2.8-.3 2.1-2 3.3-4.4 2.8z'/%3E%3C/svg%3E">
+
+<!-- Computer Modern webfonts (the typeface of the companion paper); every rule below falls back to Georgia / Times if they do not load. -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/computer-modern@0.1.3/cmu-serif.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/computer-modern@0.1.3/cmu-sans-serif.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/computer-modern@0.1.3/cmu-typewriter-text.css">
+
+<!-- MathJax renders \( ... \) and \[ ... \]. Add your own macros below if you need them. -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']],
+    macros: { ket: ['|#1\\rangle', 1], bra: ['\\langle #1|', 1], braket: ['\\langle #1\\rangle', 1] }
+  },
+  options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code', 'kbd'] }
+};
+</script>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<a class="skip" href="#main" data-skip>Skip to content</a>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-apple" viewBox="0 0 24 24">
+    <path style="fill:var(--apple-body,#c00808);stroke:var(--apple-stroke,none);stroke-width:1.6;stroke-linejoin:round" d="M12 8.6C10.8 7.4 9.2 6.8 7.6 7 4.4 7.4 2.6 10.6 3.3 14.4 4 18.5 6.6 21.4 8.6 21.4c1 0 2-.6 3.4-.6s2.4.6 3.4.6c2 0 4.6-2.9 5.3-7 .7-3.8-1.1-7-4.3-7.4-1.6-.2-3.2.4-4.4 1.6z"/>
+    <path style="fill:none;stroke:var(--apple-stem,#5a3a1a);stroke-width:1.7;stroke-linecap:round" d="M12 8.6c0-1.8.6-3.4 1.8-4.6"/>
+    <path style="fill:var(--apple-leaf,#3f8f3f)" d="M13 6.6c.4-2 2.2-3.1 4.4-2.8-.3 2.1-2 3.3-4.4 2.8z"/>
+  </symbol>
+</svg>
+
+<header class="site-head">
+  <div class="wrap head-row">
+    <a class="brand" href="#/"><svg class="apple" aria-hidden="true"><use href="#i-apple"/></svg><span id="brand-name">OpenContext</span></a>
+    <nav class="nav" aria-label="Main">
+      <a href="#/problems" data-nav="problems">Problems</a>
+      <a href="#/agenda" data-nav="agenda">Agenda</a>
+      <a href="#/tags" data-nav="tags">Tags</a>
+      <a href="#/about" data-nav="about">About</a>
+      <a href="#/contribute" data-nav="contribute">Contribute</a>
+      <a href="#" data-paper rel="noopener">Paper</a>
+      <a href="#" data-repo rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap" tabindex="-1"></main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <div class="foot-row">
+      <div class="foot-brand"><strong id="foot-name">OpenContext</strong><br><span id="foot-subtitle">Open problems in generalized contextuality</span></div>
+      <ul class="foot-links">
+        <li><a href="#/problems">All problems</a></li>
+        <li><a href="#/agenda">Research agenda</a></li>
+        <li><a href="#/about">About and how to cite</a></li>
+        <li><a href="#/contribute">Contribute</a></li>
+        <li><button class="linklike" type="button" data-json>Data as JSON</button></li>
+        <li><a href="#" data-repo rel="noopener">Source repository</a></li>
+      </ul>
+    </div>
+    <p class="foot-note"><span>Statuses are dated snapshots. Check the cited sources before relying on one.</span><button class="linklike" type="button" data-top>Back to top ↑</button></p>
+  </div>
+</footer>
+
+<!-- The tex`...` tag lets the data files contain LaTeX without doubling backslashes. -->
+<script>const tex = String.raw;</script>
+
+<!-- 1. Data: what you edit most -->
+<script src="data/site.js"></script>
+<script src="data/goals.js"></script>
+<script src="data/problems.js"></script>
+
+<!-- 2. Machinery and pages -->
+<script src="js/lib.js"></script>
+<script src="pages/home.js"></script>
+<script src="pages/problems.js"></script>
+<script src="pages/problem.js"></script>
+<script src="pages/agenda.js"></script>
+<script src="pages/tags.js"></script>
+<script src="pages/about.js"></script>
+<script src="pages/contribute.js"></script>
+<script src="js/router.js"></script>
+</body>
+</html>
