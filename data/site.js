@@ -2,12 +2,13 @@
 const SITE = {
   name: "OpenContext",
   subtitle: "Open problems in generalized contextuality",
-  byline: "Maintained by a community of people interested",
+  byline: "Valuing the ability to pose meaningful scientific questions",
+  edition: "OpenContext I",
   description: "OpenContext is a community-curated, open database of precisely stated near-term problems in generalized contextuality, each traceable to a long-term goal of the field's research agenda.",
-  abstract: "This is a curated list of well-posed, near-term problems in the subfield of quantum foundations concerned with generalized contextuality. Each problem is stated precisely enough to be attacked by skilled researchers working with or without AI assistance, is motivated within the existing literature, and is traceable to at least one long-term goal of the research agenda. Entries carry a live, dated status, a record of partial progress, and the names of the people who posed, advanced, and verified them, so that effort can be coordinated across independent groups and credit assigned fairly.",
+  abstract: "This is a curated list of <strong>original</strong>, well-posed, near-term problems in the subfield of quantum foundations concerned with generalized contextuality. Every question on it is an addition to the existing literature rather than a restatement of a known one. Each problem is stated precisely enough to be attacked by skilled researchers working with or without AI assistance, motivated within the existing literature, and traceable to at least one long-term goal of the research agenda. Entries carry a live, dated status, a record of partial progress, and the names of the people who posed, advanced, and verified them, so that effort can be coordinated across independent groups and credit assigned fairly.",
   paper: {
     title: "Accelerating research through skilled humans collaborating with AI agents: A case study in quantum foundations",
-    authors: "Community of People Interested",
+    authors: "Wagner et al.",
     year: "2026",
     url: ""                       // arXiv link once available, e.g. "https://arxiv.org/abs/2610.xxxxx"
   },
