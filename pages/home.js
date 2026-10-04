@@ -11,7 +11,7 @@ function viewHome() {
     <h1 class="title">${esc(SITE.name)}</h1>
     <p class="subtitle">${esc(SITE.subtitle)}</p>
     ${SITE.byline ? `<p class="byline">${esc(SITE.byline)}<sup>⋆</sup></p>` : ''}
-    <p class="abstract">${esc(SITE.abstract)}</p>
+    <p class="abstract">${SITE.abstract}</p>
     ${paper}
     ${SITE.byline ? `<p class="star-note"><sup>⋆</sup> The list of moderators and contributors is on the <a href="#/about?to=people">About page</a>.</p>` : ''}
   </section>
