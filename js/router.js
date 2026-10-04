@@ -42,6 +42,7 @@ function route() {
     html = viewProblem(num); title = p ? `Problem ${p.number}: ${plain(p.title)}` : 'Not found'; nav = 'problems';
   }
   else if (path === 'agenda') { html = viewAgenda(); title = 'Research agenda'; nav = 'agenda'; }
+      else if (path === 'future-goals') { html = viewFutureGoals(); title = 'Future broad goals'; nav = 'agenda'; }
   else if (path === 'tags') { html = viewTags(); title = 'Topics'; nav = 'tags'; }
   else if (path.startsWith('tag/')) { const t = topicBySlug(path.slice(4)); html = viewTag(path.slice(4)); title = t ? t.name : 'Not found'; nav = 'tags'; }
   else if (path === 'about') { html = viewAbout(); title = 'About'; nav = 'about'; }
