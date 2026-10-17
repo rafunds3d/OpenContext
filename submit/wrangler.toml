@@ -14,7 +14,7 @@ MAIL_FROM = "OpenContext <rafael.wagner@uni-ulm.de>"     # the verified sender
 # Institutional domains missing from the public university list, comma-separated. Keep in step with SITE.submit.extraDomains.
 EXTRA_DOMAINS = "perimeterinstitute.ca,oeaw.ac.at,iqoqi-vienna.at,mpg.de,cnrs.fr,cern.ch,ictp.it,icfo.eu,inl.int,ist.ac.at,ucl.ac.uk,cwi.nl,weizmann.ac.il"
 
-# Pending submissions wait here for their confirmation link (24 h), and the university list is cached here for a week.
+# Pending submissions wait here for their confirmation link (24 h), together with the filing locks and the hourly counters.
 # Create it with `npx wrangler kv namespace create SUBMISSIONS` and paste the id it prints.
 [[kv_namespaces]]
 binding = "SUBMISSIONS"

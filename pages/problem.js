@@ -3,7 +3,7 @@
 
 function viewProblem(num) {
   const p = PROBLEMS.find(x => x.number === num);
-  if (!p) return viewNotFound(`There is no Problem ${esc(num)}.`);
+  if (!p) return viewNotFound(Number.isInteger(num) ? `There is no Problem ${num}.` : 'There is no such problem.');
   const refs = (p.references || []).map(r => `<li>${r.url ? `<a href="${esc(r.url)}" rel="noopener">${esc(r.text)}</a>` : esc(r.text)}</li>`).join('');
   const hist = (p.history || []).slice().sort((a, b) => (b.date || '').localeCompare(a.date || '')).map(h => `<li>
     <span class="hist-date">${fmtDate(h.date, true)}</span>
@@ -21,7 +21,7 @@ function viewProblem(num) {
   let sec = 0; const letter = () => String.fromCharCode(65 + sec++) + '.';
   return `<p class="crumb"><a href="#/problems">All problems</a></p>
   <article class="problem prose">
-    ${problemBox(p)}
+    ${problemBox(p, { heading: true })}
     <div class="meta">
       <span>${badge(p)} <span class="small">since ${fmtDate(statusSince(p), true)}</span></span>
       <span><b>Goal${goals.length === 1 ? '' : 's'}:</b> ${goals.map(g => `<a href="#/agenda?to=${g.id}">${g.numeral}. ${esc(g.title)}</a>`).join(', ') || '<span class="muted">none</span>'}</span>
@@ -33,7 +33,6 @@ function viewProblem(num) {
     ${p.background ? `<h2 class="sec-title">${letter()} Background</h2>${paras(p.background)}` : ''}
     ${p.relevance ? `<h2 class="sec-title">${letter()} Relevance</h2>${paras(p.relevance)}` : ''}
     ${p.significance ? `<h2 class="sec-title">${letter()} Significance</h2>${paras(p.significance)}` : ''}
-    ${!p.relevance && !p.significance && p.motivation ? `<h2 class="sec-title">${letter()} Motivation</h2>${paras(p.motivation)}` : ''}
     <h2 class="sec-title">${letter()} Progress and history</h2>
     ${hist ? `<ul class="hist">${hist}</ul>` : `<p class="muted">No entries yet.</p>`}
     <h2 class="sec-title">${letter()} Contributions</h2>

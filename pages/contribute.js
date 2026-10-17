@@ -36,7 +36,7 @@ function viewContribute() {
   <pre>${esc(problemTemplate())}</pre>
   <p>A contribution to an entry:</p>
   <pre>${esc(contributionTemplate(1))}</pre>
-  <p>Progress agreed with the moderators, including a change of status, is recorded in the problem's <code>history</code> list, newest at the bottom, with entries like <code>${esc(advanceTemplate())}</code>.</p>
+  <p>Progress agreed with the moderators is recorded in the problem's <code>history</code> list, newest at the bottom, with entries like <code>${esc(advanceTemplate())}</code>. A change of status is a <code>status</code> entry naming the new status in <code>to</code>, which is what moves "status since" and steps the <a href="#/progress">progress chart</a>: <code>${esc(statusTemplate())}</code>.</p>
 
   <h2 class="sec-title">F. Mistakes and disputes</h2>
   <p>${repo ? `If a status is out of date or a reference is wrong, <a href="${esc(repo)}/issues" rel="noopener">open an issue</a>` : 'If a status is out of date or a reference is wrong, write to the moderators'}${mail ? `${repo ? ' or write to' : ''} ${mail}` : ''}, quoting the problem number. Questions of priority or attribution are settled by the recorded history of the entry, which is why dating every contribution matters. Disputes about a claimed solution are handled as the <a href="#/guidelines?to=solved">guidelines</a> describe.</p>

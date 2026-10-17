@@ -3,11 +3,13 @@
    ---------------------------------------------------------------------
    Write math inside tex`...` strings: inline between \( and \), display
    between \[ and \]. A blank line starts a new paragraph.
-   Dates are YYYY-MM-DD. history entries have kind "posed", "status",
-   "advance", "claim", "verification", "exposition", "challenge",
-   "interest", "comment" or "note"; the newest status entry sets the
-   date the current status has held since. Contributions submitted
-   through the site land in data/contributions.js instead.
+   Dates are YYYY-MM-DD. history entries have kind "posed", "status"
+   (with to: the new status), "advance", "interest" or "note"; the
+   newest status entry sets the date the current status has held since
+   and the status entries draw the progress chart. Claims, verifications,
+   expositions, challenges and comments are contributions and go in
+   data/contributions.js, which also credits "verified by" and
+   "explained by".
    ===================================================================== */
 const PROBLEMS = [
   {
@@ -60,7 +62,7 @@ The problem traces to Goal I, Reconceptualization of classicality, on two of its
       { text: "N. C. Dias and J. N. Prata, On a recent conjecture by Z. Van Herstraeten and N. J. Cerf for the quantum Wigner entropy, Ann. Henri Poincaré 24, 2341 (2023)", url: "" },
       { text: "L. Catani, M. Leifer, G. Scala, D. Schmid and R. W. Spekkens, What is nonclassical about uncertainty relations?, Phys. Rev. Lett. 129, 240401 (2022)", url: "" },
       { text: "R. W. Spekkens, Negativity and contextuality are equivalent notions of nonclassicality, Phys. Rev. Lett. 101, 020401 (2008)", url: "" },
-      { text: "D. Schmid, R. D. Baldijão, Y. Yīng, R. Wagner and J. H. Selby, Kirkwood-Dirac representations beyond quantum states and their relation to noncontextuality, Phys. Rev. A 110, 052206 (2024)", url: "" },
+      { text: "D. Schmid, J. H. Selby, M. F. Pusey and R. W. Spekkens, A structure theorem for generalized-noncontextual ontological models, Quantum 8, 1283 (2024)", url: "https://doi.org/10.22331/q-2024-03-14-1283" },
       { text: "R. Wagner, R. D. Baldijão, M. Salzger, Y. Yīng, D. Schmid and J. H. Selby, A structure theorem for complex-valued quasiprobability representations of physical theories (2025)", url: "https://arxiv.org/abs/2509.10949" }
     ]
   },
@@ -120,7 +122,7 @@ Standard quantum state or process tomography has a sample complexity that scales
 The problem traces to Goal III, Useful applications, through its witnessing theme: devising tests that are tighter, cheaper, and robust, and scaling them to high-dimensional systems.`,
     significance: tex`A quantitative answer, in either direction, gives the experimental side of Goal III a concrete target. A polynomial scaling would justify extending theory-agnostic contextuality experiments to larger systems; a worse scaling would locate the bottleneck and motivate restricted fragments or approximate certification schemes.
 
-A complementary, and to some extent independent, line of research addresses the same sample-complexity question within quantum theory itself, in the recently established framework of relative tomography restricted to a fragment, that is, to a subset of the states and effects of the theory [Schmid et al. 2025]. There it is easy to formalize a near-term question with respect to the states and effects forming the fragment; the companion paper discusses it as Problem 9 of OpenContext, a separate entry.`,
+A complementary, and to some extent independent, line of research addresses the same sample-complexity question within quantum theory itself, in the recently established framework of relative tomography restricted to a fragment, that is, to a subset of the states and effects of the theory [Schmid et al. 2025]. There it is easy to formalize a near-term question with respect to the states and effects forming the fragment; the companion paper poses it as a further OpenContext entry, to be listed separately once the first batch of problems is complete.`,
     history: [
       { date: "2026-10-03", kind: "posed", text: "Entry created from Problem III of the companion paper.", by: [] }
     ],

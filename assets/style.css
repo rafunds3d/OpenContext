@@ -80,7 +80,7 @@ mjx-container[display="true"] { margin: .9em 0 !important; }
 .stat { color: var(--ink); display: inline-flex; align-items: baseline; gap: .45rem; }
 .stat strong { font-size: 1.7rem; font-weight: 700; line-height: 1; }
 .stat span { font-variant: small-caps; letter-spacing: .05em; color: var(--ink-2); }
-.stat:hover { text-decoration: none; color: var(--red); }
+a.stat:hover { text-decoration: none; color: var(--red); }
 
 /* search and controls */
 .search { display: flex; gap: .5rem; flex-wrap: wrap; margin: 1rem 0 .3rem; }
@@ -114,7 +114,7 @@ mjx-container[display="true"] { margin: .9em 0 !important; }
 .cbox { border: 1.5px solid var(--brown); background: var(--tan); }
 .pbox-title, .cbox-title { position: absolute; top: -.95rem; left: 50%; transform: translateX(-50%); font-family: var(--sans); font-weight: 700; font-size: .92rem; line-height: 1.3; color: #fff; padding: .28rem .85rem; border-radius: 5px; white-space: nowrap; max-width: calc(100% - 1.5rem); overflow: hidden; text-overflow: ellipsis; }
 .pbox-title { background: var(--red-tab); border: 1.5px solid var(--red-border); }
-.cbox-title { background: var(--amber); border: 1.5px solid var(--brown); }
+.cbox-title { background: var(--amber); border: 1.5px solid var(--brown); color: var(--ink); }   /* dark on amber: white on it is too faint to read */
 .pbox p, .cbox p { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
 .pbox p:last-child, .cbox p:last-child { margin-bottom: 0; }
 .cbox dl { margin: 0; }
@@ -123,7 +123,6 @@ mjx-container[display="true"] { margin: .9em 0 !important; }
 .cbox dt, .cbox dd { display: inline; margin: 0; }
 .cbox dt { font-weight: 700; }
 .pbox .more { text-align: right; margin: .9rem 0 0; font-size: .95rem; }
-.pbox h3 { font-size: 1.05rem; margin: 0 0 .5rem; }
 
 /* apple icons: red = open problem, outline = under revision, grey = solved, golden = long-term goal */
 .apple { width: 1.05em; height: 1.05em; vertical-align: -.16em; flex: none; --apple-body: #c00808; --apple-leaf: #3f8f3f; --apple-stem: #5a3a1a; --apple-stroke: none; }
@@ -140,7 +139,7 @@ mjx-container[display="true"] { margin: .9em 0 !important; }
 .st-open { color: var(--ink-2); }
 .st-solved { color: var(--green); }
 .st-under-revision { color: var(--blue); }
-.gchip { font-weight: 700; font-size: .85rem; border: 1px solid var(--ink); border-radius: 3px; padding: 0 .35rem; color: var(--ink); white-space: nowrap; }
+.gchip { display: inline-block; min-width: 1.5rem; text-align: center; font-weight: 700; font-size: .85rem; line-height: 1.55; border: 1px solid var(--ink); border-radius: 3px; padding: .1rem .35rem; color: var(--ink); white-space: nowrap; }   /* at least 24px to tap */
 .gchip:hover { text-decoration: none; background: var(--ink); color: #fff; }
 .chips { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .7rem; }
 .chip { font-size: .85rem; color: var(--ink-2); border: 1px solid var(--rule-2); border-radius: 999px; padding: .05rem .55rem; }
@@ -176,10 +175,6 @@ mjx-container[display="true"] { margin: .9em 0 !important; }
 .people div { margin: .2rem 0; }
 .steps { padding-left: 1.4rem; margin: 0 0 1rem; }
 .steps li { margin: .4rem 0; }
-.toc { list-style: none; margin: 0 auto 1rem; padding: 0; max-width: 28rem; font-size: 1rem; }
-.toc li { display: flex; justify-content: space-between; gap: 1rem; padding: .15rem 0; }
-.toc a { color: var(--ink); }
-.toc .pg { color: var(--red); }
 
 /* forms (the Submit page), set like the search box */
 .form { margin: 1.4rem 0 0; }
@@ -201,6 +196,7 @@ mjx-container[display="true"] { margin: .9em 0 !important; }
 .callout { border-left: 3px solid var(--green); background: #f4faf4; padding: .6rem .9rem; margin: 1rem 0 1.2rem; font-size: .98rem; }
 .callout.err { border-left-color: var(--red); background: var(--red-tint); }
 .callout[hidden] { display: none; }
+#entry-code { white-space: pre-wrap; overflow-wrap: anywhere; }
 
 /* contributions and posts */
 .flag { font-family: var(--mono); font-size: .78rem; color: var(--brown); border: 1px solid currentColor; border-radius: 3px; padding: 0 .35rem; margin-left: .3rem; }
@@ -212,8 +208,9 @@ mjx-container[display="true"] { margin: .9em 0 !important; }
 
 /* the progress chart */
 .chart-wrap { position: relative; margin: .6rem 0 .4rem; }
-.chart { width: 100%; height: auto; display: block; font-family: var(--sans); }
-.chart text { font-size: 11px; fill: var(--ink-2); }
+.chart-scroll { overflow-x: auto; }                                   /* on a phone the chart keeps a legible size and scrolls sideways */
+.chart { width: 100%; min-width: 560px; height: auto; display: block; font-family: var(--sans); }
+.chart text { font-size: 11px; fill: var(--ink-2); paint-order: stroke; stroke: var(--paper); stroke-width: 3px; stroke-linejoin: round; }
 .chart .grid { stroke: var(--rule); stroke-width: 1; }
 .chart .axis { stroke: var(--rule-2); stroke-width: 1; }
 .chart .series { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
@@ -233,7 +230,9 @@ mjx-container[display="true"] { margin: .9em 0 !important; }
   .goal-count { grid-column: 2; }
   .hist li { grid-template-columns: 1fr; gap: .1rem; }
   .masthead .title { font-size: 1.7rem; }
-  .prose p, .prose li, .pbox p, .cbox dd, .masthead .abstract { text-align: left; }
+  .prose p, .prose li, .pbox p, .cbox dl > div, .masthead .abstract { text-align: left; }
+  /* the problem page's title tab wraps instead of being cut off */
+  h1.pbox-title { position: static; transform: none; display: block; width: fit-content; max-width: 100%; margin: -2.45rem auto .8rem; white-space: normal; overflow: visible; text-align: center; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }

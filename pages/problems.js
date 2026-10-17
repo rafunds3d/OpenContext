@@ -2,16 +2,16 @@
    Every function here returns an HTML string; helpers and data come from the files loaded before it (see index.html). */
 
 function viewProblems(params) {
-  const statusParam = params.get('status') || '';
-  const status = ['closed', ...Object.keys(STATUSES)].includes(statusParam) ? statusParam : 'all';
+  const statusParam = params.get('status') === 'closed' ? 'solved' : (params.get('status') || '');   // 'closed' is an older alias
+  const status = Object.keys(STATUSES).includes(statusParam) ? statusParam : 'all';
   const goal = GOALS.some(g => g.id === params.get('goal')) ? params.get('goal') : '';
   const q = (params.get('q') || '').trim();
   const sortParam = params.get('sort') || '';
   const sort = sortParam || (q ? 'relevance' : 'number');
   let base = q ? search(q) : PROBLEMS.slice();
   if (goal) base = base.filter(p => (p.goals || []).includes(goal));
-  const matches = s => s === 'all' ? () => true : s === 'closed' ? isClosed : p => p.status === s;
-  const counts = {}; for (const s of ['all', 'open', 'under-revision', 'closed']) counts[s] = base.filter(matches(s)).length;
+  const matches = s => s === 'all' ? () => true : p => p.status === s;
+  const counts = {}; for (const s of ['all', ...Object.keys(STATUSES)]) counts[s] = base.filter(matches(s)).length;
   let list = base.filter(matches(status));
   if (sort === 'date') list = list.slice().sort(byDateDesc);
   else if (sort === 'number' || !q) list = list.slice().sort(byNumber);
@@ -28,7 +28,7 @@ function viewProblems(params) {
     <label for="sort" class="visually-hidden">Sort by</label>
     <select id="sort" name="sort">${q ? opt('relevance', 'Relevance') : ''}${opt('number', 'By number')}${opt('date', 'Recently updated')}</select>
   </form>
-  <nav class="tabs" aria-label="Filter by status">${tab('all', 'All')}${tab('open', apple() + 'Open')}${tab('under-revision', apple('apple-revision') + 'Under revision')}${tab('closed', apple('apple-done') + 'Solved')}</nav>
+  <nav class="tabs" aria-label="Filter by status">${tab('all', 'All')}${tab('open', apple() + 'Open')}${tab('under-revision', apple('apple-revision') + 'Under revision')}${tab('solved', apple('apple-done') + 'Solved')}</nav>
   <div class="filters"><span>Goal:</span> ${gfilter} ${goal ? `<a class="small" href="${link({ status, goal: '', q, sort: sortParam })}">clear</a>` : ''}</div>
   ${q ? `<p class="muted small">${list.length} ${list.length === 1 ? 'result' : 'results'} for “${esc(q)}”. <a href="${link({ status, goal })}">Clear search</a></p>` : ''}
   ${rows(list, { empty, since: true })}`;

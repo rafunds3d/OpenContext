@@ -4,7 +4,7 @@ The site is static, so something has to turn a researcher's submission into a pu
 
 ## What it does
 
-1. The Submit page posts the form to `POST /submit`. The worker checks the fields, refuses free-mail providers, and accepts the domain if it ends in `.edu`, `.edu.xx` or `.ac.xx`, is in `EXTRA_DOMAINS`, or appears in a [public list of university domains](https://github.com/Hipo/university-domains-list) (cached for a week). The submission is stored for 24 hours and a confirmation link is e-mailed to the address.
+1. The Submit page posts the form to `POST /submit`. The worker checks the fields, refuses free-mail providers, and accepts the domain if it is under `.edu` or one of the academic suffixes of the Public Suffix List (`ac.uk`, `edu.br`, `ac.jp`, …), under `EXTRA_DOMAINS`, or under a domain of the [public list of university domains](https://github.com/Hipo/university-domains-list) bundled in `domains.js`. It accepts at most ten submissions an hour from one network address and sends at most three confirmation e-mails an hour to one address. The submission is stored for 24 hours and a confirmation link is e-mailed to the address.
 2. The researcher opens the link (`GET /verify?t=…`). The worker creates a branch, appends the entry to the right data file (`data/problems.js`, `data/contributions.js`, `data/posts.js` or the `FUTURE_GOALS` list in `data/goals.js`) in the same format as the hand-written entries, opens a pull request labelled `submission`, and sends the browser back to the site with the link to it. A claimed solution also places the problem under revision in the same pull request.
 3. A moderator reads the pull request and merges it to accept, edits it first if something needs changing, or closes it to decline. GitHub Pages redeploys the site within a minute or two.
 
@@ -27,7 +27,8 @@ Check it with `curl "https://…workers.dev/check?domain=uni-ulm.de"` (expect `"
 
 ## Changing it
 
-- Institutions missing from the public list go in `EXTRA_DOMAINS` here and in `SITE.submit.extraDomains` in `data/site.js` (the site uses its copy to reassure people before they submit).
+- Institutions missing from the public list go in `EXTRA_DOMAINS` here and in `SITE.submit.extraDomains` in `data/site.js` (the site uses its copy to reassure people before they submit). `node build-domains.mjs` refreshes `domains.js` from the public list; commit the result.
+- Submitted text is published as written, with LaTeX and the tags `em`, `strong`, `a` (http links only), `code`, `sup`, `sub` and `br`; any other markup is shown literally, so a submission cannot run code on visitors' browsers.
 - `npm test` (or `node test.mjs`) runs the checks on the pure parts of the worker: validation, the entry format, inserting into the data files, placing a problem under revision. Run it after editing `worker.js` or changing the layout of a data file.
 - `npx wrangler dev` runs the service locally; `npx wrangler tail` streams its logs.
 - Secrets can be rotated at any time with `npx wrangler secret put`.

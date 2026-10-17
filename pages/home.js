@@ -19,7 +19,7 @@ function viewHome() {
     <a class="stat" href="#/problems"><strong>${PROBLEMS.length}</strong><span>${PROBLEMS.length === 1 ? 'problem' : 'problems'}</span></a>
     <a class="stat" href="#/problems?status=open"><strong>${open}</strong><span>open</span></a>
     ${revising ? `<a class="stat" href="#/problems?status=under-revision"><strong>${revising}</strong><span>under revision</span></a>` : ''}
-    <a class="stat" href="#/problems?status=closed"><strong>${closed}</strong><span>solved</span></a>
+    <a class="stat" href="#/problems?status=solved"><strong>${closed}</strong><span>solved</span></a>
   </nav>
   <form class="search" id="search-form" role="search">
     <label for="q" class="visually-hidden">Search problems</label>

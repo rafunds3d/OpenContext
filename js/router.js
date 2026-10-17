@@ -37,7 +37,8 @@ function route() {
   if (path === '') { html = viewHome(); nav = 'home'; }
   else if (path === 'problems') { html = viewProblems(params); title = 'Problems'; nav = 'problems'; }
   else if (path.startsWith('problem/')) {
-    const num = parseInt(path.slice('problem/'.length), 10);
+    const tail = path.slice('problem/'.length);
+    const num = /^\d+$/.test(tail) ? parseInt(tail, 10) : NaN;
     const p = PROBLEMS.find(x => x.number === num);
     html = viewProblem(num); title = p ? `Problem ${p.number}: ${plain(p.title)}` : 'Not found'; nav = 'problems';
   }
@@ -52,7 +53,7 @@ function route() {
   else if (path === 'about') { html = viewAbout(); title = 'About'; nav = 'about'; }
   else if (path === 'contribute') { html = viewContribute(); title = 'Contribute'; nav = 'contribute'; }
   else if (path === 'submit') { html = viewSubmit(params); title = 'Submit'; nav = 'contribute'; }
-  else if (path.startsWith('random')) {
+  else if (path === 'random' || path.startsWith('random/')) {
     const status = path.split('/')[1] || '';
     const p = randomProblem(status === 'any' ? '' : (status || 'open'));
     location.replace(p ? problemUrl(p) : '#/problems');

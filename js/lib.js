@@ -12,7 +12,7 @@ function fmtDate(iso, short) {
   const name = MONTHS[(m || 1) - 1] || '';
   return `${d} ${short ? name.slice(0, 3) : name} ${y}`;
 }
-function todayIso() { return new Date().toISOString().slice(0, 10); }
+function todayIso() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }   // the visitor's own calendar date
 function qs(obj) { const p = new URLSearchParams(); for (const [k, v] of Object.entries(obj)) if (v) p.set(k, v); const s = p.toString(); return s ? '?' + s : ''; }
 function siteUrl() { return location.href.split('#')[0]; }
 const paras = s => String(s || '').trim().split(/\n\s*\n/).filter(Boolean).map(x => `<p>${x.trim()}</p>`).join('');
@@ -27,15 +27,25 @@ const statusInfo = s => STATUSES[s] || { label: s, closed: false };
 const isClosed = p => statusInfo(p.status).closed;
 const contributionsFor = p => (typeof CONTRIBUTIONS !== 'undefined' ? CONTRIBUTIONS : []).filter(c => c.problem === p.number).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 const updatedOf = p => [...(p.history || []), ...contributionsFor(p)].reduce((m, h) => (h.date || '') > m ? h.date : m, '') || SITE.started;
-const statusSince = p => { const h = (p.history || []).filter(x => x.kind === 'status' || x.kind === 'posed').sort((a, b) => (b.date || '').localeCompare(a.date || '')); return h.length ? h[0].date : updatedOf(p); };
+const statusSince = p => { const h = (p.history || []).filter(x => x.kind === 'status' || x.kind === 'posed').sort((a, b) => (b.date || '').localeCompare(a.date || '')); return (h.length && h[0].date) || SITE.started; };
 const latest = () => PROBLEMS.reduce((m, p) => updatedOf(p) > m ? updatedOf(p) : m, '');
 const byDateDesc = (a, b) => updatedOf(b).localeCompare(updatedOf(a)) || a.number - b.number;
 const byNumber = (a, b) => a.number - b.number;
 const problemUrl = p => `#/problem/${p.number}`;
 const problemLabel = p => `Problem ${p.number}`;
-/* What an entry under revision displays, as the paper asks: the date of the claim and the number of
-   independent verifications and explanatory expositions received since. */
-const revisionStats = p => { const since = statusSince(p); const cs = contributionsFor(p).filter(c => (c.date || '') >= since); return { since, claims: cs.filter(c => c.kind === 'claim').length, verifications: cs.filter(c => c.kind === 'verification').length, expositions: cs.filter(c => c.kind === 'exposition').length }; };
+/* What an entry under revision displays, as the paper asks: the date of the claim and the number of independent
+   verifications and explanatory expositions received since. The claim is the newest one recorded in the current status
+   window (after the previous status change, on or before the one that placed the problem under revision); failing that,
+   the date of the status change itself. */
+const revisionStats = p => {
+  const marks = (p.history || []).filter(x => (x.kind === 'status' || x.kind === 'posed') && x.date).map(x => x.date).sort();
+  const st = statusSince(p), prev = marks.filter(d => d < st).pop() || '';
+  const all = contributionsFor(p);
+  const claim = all.filter(c => c.kind === 'claim' && (c.date || '') > prev && (c.date || '') <= st).map(c => c.date).sort().pop();
+  const since = claim || st;
+  const cs = all.filter(c => (c.date || '') >= since);
+  return { since, claims: cs.filter(c => c.kind === 'claim').length, verifications: cs.filter(c => c.kind === 'verification').length, expositions: cs.filter(c => c.kind === 'exposition').length };
+};
 const contributionKind = k => (typeof CONTRIBUTION_KINDS !== 'undefined' && CONTRIBUTION_KINDS[k]) ? CONTRIBUTION_KINDS[k].label : k;
 const aiUseLabel = a => (typeof AI_USE !== 'undefined' && AI_USE[a]) || '';
 const postsAll = () => (typeof POSTS !== 'undefined' ? POSTS : []).slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
@@ -57,7 +67,7 @@ function randomProblem(status, excludeNumber) {
   return base.length ? base[Math.floor(Math.random() * base.length)] : null;
 }
 function textOf(p) {
-  return [problemLabel(p), p.title, p.statement, p.background, p.relevance, p.significance, p.motivation, (p.topics || []).join(' '), problemGoals(p).map(g => g.title).join(' '),
+  return [problemLabel(p), p.title, p.statement, p.background, p.relevance, p.significance, (p.topics || []).join(' '), problemGoals(p).map(g => g.title).join(' '),
     (p.posedBy || []).join(' '), (p.history || []).map(h => h.text).join(' '), contributionsFor(p).map(c => c.title + ' ' + (c.summary || '')).join(' ')].filter(Boolean).join(' ').replace(/<[^>]+>/g, ' ').toLowerCase();
 }
 function search(q) {
@@ -86,9 +96,11 @@ function rows(list, opts = {}) {
     <p class="row-meta"><span>${goalChips(p)}</span><span>${opts.since ? 'status since ' + fmtDate(statusSince(p), true) : 'updated ' + fmtDate(updatedOf(p), true)}</span>${(p.posedBy || []).length ? `<span>posed by ${names(p.posedBy)}</span>` : ''}</p>
   </li>`).join('')}</ul>`;
 }
+/* opts.heading makes the title tab the page's h1 (the problem page); opts.link adds the link to that page (the home card) */
 function problemBox(p, opts = {}) {
+  const T = opts.heading ? 'h1' : 'div';
   return `<article class="pbox">
-    <div class="pbox-title" title="${esc(problemLabel(p))}: ${esc(p.title)}">${apple('apple-white')}${esc(problemLabel(p))}: ${esc(p.title)}</div>
+    <${T} class="pbox-title" title="${esc(problemLabel(p))}: ${esc(p.title)}">${apple('apple-white')}${esc(problemLabel(p))}: ${esc(p.title)}</${T}>
     ${paras(p.statement)}
     ${opts.link ? `<p class="more"><a href="${problemUrl(p)}">Open problem page →</a></p>` : ''}
   </article>`;
@@ -166,6 +178,10 @@ display math between \\[ and \\]. A blank line starts a new paragraph.\`,
 function advanceTemplate() {
   return `{ date: "${todayIso()}", kind: "advance", text: "What was shown, how, and with which tools (say so if AI-assisted and if provisional).", by: ["Your Name"], url: "https://..." }`;
 }
+/* a change of status: `to` names the new status, and the progress chart steps on `date` */
+function statusTemplate(to = 'under-revision') {
+  return `{ date: "${todayIso()}", kind: "status", to: "${to}", text: "A solution has been claimed; the problem is placed under revision.", by: [] }`;
+}
 function contributionTemplate(number) {
   return `{
   problem: ${number || 1},
@@ -184,19 +200,38 @@ function contributionTemplate(number) {
 /* The fixed submission format. buildEntry turns the fields of the Submit form into an entry for the data files;
    serializeEntry writes it as the JavaScript the data files are made of. The submission service in submit/ does the
    same on the server, so an entry submitted through the site and one written by hand look alike. */
+/* Text fields are published as HTML, so that <em>, <strong>, <a>, <code>, <sup>, <sub> and <br> work alongside LaTeX;
+   every other tag-shaped piece of text is shown literally, and a link must be http(s). Identical in submit/worker.js. */
+const ALLOWED_TAGS = { em: 1, strong: 1, b: 1, i: 1, code: 1, sup: 1, sub: 1, br: 1, a: 1 };
+function sanitizeMarkup(s) {
+  return String(s ?? '').replace(/<(\/?)([a-zA-Z][a-zA-Z0-9]*)([^<>]*)>|<(?=[a-zA-Z!\/?])/g, (m, slash, name, attrs) => {
+    if (name === undefined) return '&lt;';
+    const n = name.toLowerCase();
+    if (ALLOWED_TAGS[n] !== 1) return '&lt;' + m.slice(1);
+    if (n === 'a' && !slash) {
+      const h = /\shref\s*=\s*(?:"([^"]*)"|'([^']*)')/i.exec(attrs);
+      const url = h ? (h[1] ?? h[2]) : '';
+      return /^https?:\/\/[^\s"'<>]+$/.test(url) ? `<a href="${url}" rel="noopener">` : '&lt;' + m.slice(1);
+    }
+    if (attrs.trim()) return '&lt;' + m.slice(1);
+    return `<${slash}${n}>`;
+  });
+}
+const webUrl = u => /^https?:\/\/\S+$/.test(u) ? u : '';
 function buildEntry(type, f, meta) {
   const by = meta.by || [], ai = meta.ai || '', date = meta.date || todayIso();
   const list = s => String(s || '').split(',').map(x => x.trim()).filter(Boolean);
   const lines = s => String(s || '').split('\n').map(x => x.trim()).filter(Boolean);
+  const text = sanitizeMarkup;
   if (type === 'problem') return {
     number: meta.number, title: f.title, status: 'open', goals: list(f.goals), topics: list(f.topics), posedBy: by, curatedBy: [], ai,
-    statement: f.statement, background: f.background, relevance: f.relevance, significance: f.significance,
+    statement: text(f.statement), background: text(f.background), relevance: text(f.relevance), significance: text(f.significance),
     history: [{ date, kind: 'posed', text: 'Problem posed through the site.', by }],
-    references: lines(f.references).map(l => { const i = l.indexOf('|'); return i < 0 ? { text: l, url: '' } : { text: l.slice(0, i).trim(), url: l.slice(i + 1).trim() }; })
+    references: lines(f.references).map(l => { const i = l.indexOf('|'); return i < 0 ? { text: l, url: '' } : { text: l.slice(0, i).trim(), url: webUrl(l.slice(i + 1).trim()) }; })
   };
-  if (type === 'contribution') return { problem: Number(f.problem), date, kind: f.kind, title: f.title, material: f.material, ai, by, provisional: !!f.provisional, summary: f.summary, url: f.url || '' };
-  if (type === 'post') return { slug: meta.slug || slug(f.title), title: f.title, date, by, ai, challengeTo: f.challengeTo || '', problems: list(f.problems).map(Number).filter(n => n > 0), summary: f.summary, body: f.body };
-  return { title: f.title, proposedBy: by, date, ai, summary: f.summary, description: f.description };
+  if (type === 'contribution') return { problem: Number(f.problem), date, kind: f.kind, title: f.title, material: f.material, ai, by, provisional: !!f.provisional, summary: text(f.summary), url: webUrl(f.url || '') };
+  if (type === 'post') return { slug: meta.slug || slug(f.title) || 'post', title: f.title, date, by, ai, challengeTo: f.challengeTo || '', problems: list(f.problems).map(Number).filter(n => n > 0), summary: f.summary, body: text(f.body) };
+  return { title: f.title, proposedBy: by, date, ai, summary: f.summary, description: text(f.description) };
 }
 function serializeEntry(v, ind = '  ') {
   if (Array.isArray(v)) {
