@@ -4,6 +4,11 @@
 function viewProblem(num) {
   const p = PROBLEMS.find(x => x.number === num);
   if (!p) return viewNotFound(Number.isInteger(num) ? `There is no Problem ${num}.` : 'There is no such problem.');
+  return `<p class="crumb"><a href="#/problems">All problems</a></p>
+  ${problemArticle(p)}`;
+}
+/* the entry itself; data-edit lets a signed-in moderator edit it in place (see pages/moderate.js) */
+function problemArticle(p) {
   const refs = (p.references || []).map(r => `<li>${r.url ? `<a href="${esc(r.url)}" rel="noopener">${esc(r.text)}</a>` : esc(r.text)}</li>`).join('');
   const hist = (p.history || []).slice().sort((a, b) => (b.date || '').localeCompare(a.date || '')).map(h => `<li>
     <span class="hist-date">${fmtDate(h.date, true)}</span>
@@ -19,10 +24,9 @@ function viewProblem(num) {
   const advanced = [...new Set([...(p.history || []).filter(h => h.kind === 'advance').flatMap(h => h.by || []), ...byKinds(['claim', 'partial', 'negative', 'reformulation', 'decomposition', 'evidence'])])];
   const verified = byKinds(['verification']), explained = byKinds(['exposition']);
   let sec = 0; const letter = () => String.fromCharCode(65 + sec++) + '.';
-  return `<p class="crumb"><a href="#/problems">All problems</a></p>
-  <article class="problem prose">
+  return `<article class="problem prose" data-edit="PROBLEMS:${PROBLEMS.indexOf(p)}">
     ${problemBox(p, { heading: true })}
-    <div class="meta">
+    <div class="meta" data-edit-slot>
       <span>${badge(p)} <span class="small">since ${fmtDate(statusSince(p), true)}</span></span>
       <span><b>Goal${goals.length === 1 ? '' : 's'}:</b> ${goals.map(g => `<a href="#/agenda?to=${g.id}">${g.numeral}. ${esc(g.title)}</a>`).join(', ') || '<span class="muted">none</span>'}</span>
       <span><b>Posed by:</b> ${posed}</span>

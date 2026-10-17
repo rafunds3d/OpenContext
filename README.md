@@ -20,14 +20,17 @@ pages/home.js          one file per page: each defines a function that returns t
 pages/problems.js        (the list)        pages/problem.js     (a single problem)
 pages/agenda.js          pages/future-goals.js   pages/tags.js   pages/progress.js  (the status timeline)
 pages/blog.js            pages/guidelines.js     pages/about.js  pages/contribute.js  pages/submit.js
+pages/moderate.js        the moderators' pages: sign-in, the queue of submissions, the Edit form
 js/lib.js              shared pieces: apples, status labels, rows, the red and tan boxes, templates, the submission format
 js/router.js           turns #/problems, #/problem/3, … into calls of the page functions; loaded last
-submit/                the submission service: a Cloudflare Worker that turns a submission into a pull request (see below)
+submit/                the service: a Cloudflare Worker that turns a submission into a pull request and lets moderators edit on the site (see below)
 ```
 
 ## Editing
 
-**A problem or a piece of text.** Edit the file under `data/`. On GitHub, open the file, press the pencil icon, change it, and commit; the site redeploys by itself within a minute or two (watch the *Actions* tab for "pages build and deployment").
+**On the site (moderators).** With the service in `submit/` deployed, moderators sign in through the *Moderators* link in the footer: a link is e-mailed to an address on the service's moderator list, and the browser then stays signed in for 30 days. Every problem, contribution, post, goal and direction then shows an *Edit* button next to it, which opens a form with the entry's fields, a preview, and a save that is published at once as a commit in the moderator's name (or as a pull request, if the service is set up that way); new entries can be added the same way, and submissions waiting as pull requests are accepted or declined on the Moderation page. Nothing else changes: the files under `data/` stay the source of truth and can still be edited on GitHub. See [`submit/README.md`](submit/README.md), "Moderators".
+
+**A problem or a piece of text, on GitHub.** Edit the file under `data/`. On GitHub, open the file, press the pencil icon, change it, and commit; the site redeploys by itself within a minute or two (watch the *Actions* tab for "pages build and deployment").
 
 **Anything bigger.** Work locally:
 
@@ -74,7 +77,7 @@ As in the paper: a problem enters as `open`; a claimed solution places it `under
 
 Researchers submit through the Submit page (`pages/submit.js`), which asks for an institutional e-mail address and the name of at least one human contributor, and records the type of material and the extent of AI use. With `SITE.submit.endpoint` set in `data/site.js`, the form posts to the service in `submit/`: it e-mails a confirmation link, and when the link is opened it appends the entry to the right data file on a new branch and opens a pull request, so that accepting a submission is merging it. A claimed solution also places the problem under revision in the same pull request. Addresses are accepted under `.edu` and the academic suffixes of the Public Suffix List (`ac.uk`, `edu.br`, …), under the `extraDomains` of `data/site.js`, and under the university domains bundled in `submit/domains.js`; the service limits submissions per hour and per address. Submitted text is published as written, with LaTeX and the tags `em`, `strong`, `a`, `code`, `sup`, `sub` and `br`; any other markup is shown literally. Setting the service up takes a free Cloudflare account, a GitHub token and an e-mail sending account; the steps are in [`submit/README.md`](submit/README.md). Without the endpoint, the Submit page produces the entry in the fixed format together with an e-mail to the moderators, who paste it in.
 
-Free-mail providers are refused. Domains ending in `.edu`, `.edu.xx` or `.ac.xx` are accepted at once; others are looked up in a public list of university domains plus the `extraDomains` in `data/site.js` (and `EXTRA_DOMAINS` in `submit/wrangler.toml`), which is where to add an institute the list lacks.
+Free-mail providers are refused. An institute that the bundled list lacks goes in `extraDomains` in `data/site.js` (which the Submit page uses to reassure people) and in `EXTRA_DOMAINS` in `submit/wrangler.toml` (which the service uses). The same service signs the moderators in and carries their edits (see "Editing" above): the moderators' addresses are `MODERATOR_EMAILS` in `submit/wrangler.toml`.
 
 ## Math
 

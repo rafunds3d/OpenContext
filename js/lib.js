@@ -108,11 +108,12 @@ function problemBox(p, opts = {}) {
 /* Contributions attached to an entry, each in the fixed format: title, type of material, AI use, named people. */
 function contribRows(list) {
   if (!list.length) return '';
-  return `<ul class="hist contribs">${list.map(c => `<li>
+  const all = typeof CONTRIBUTIONS !== 'undefined' ? CONTRIBUTIONS : [];
+  return `<ul class="hist contribs">${list.map(c => `<li data-edit="CONTRIBUTIONS:${all.indexOf(c)}">
     <span class="hist-date">${fmtDate(c.date, true)}</span>
     <span><span class="hist-kind">${esc(contributionKind(c.kind))}</span>${c.url ? `<a href="${esc(c.url)}" rel="noopener">${esc(c.title)}</a>` : `<strong>${esc(c.title)}</strong>`}${c.provisional ? ' <span class="flag">provisional</span>' : ''}
       ${c.summary ? `<div class="contrib-sum">${paras(c.summary)}</div>` : ''}
-      <p class="contrib-meta">${c.material ? esc(c.material) + ' · ' : ''}${esc(aiUseLabel(c.ai) || 'AI use not stated')}${(c.by || []).length ? ` · <span class="hist-by">${names(c.by)}</span>` : ''}</p></span>
+      <p class="contrib-meta" data-edit-slot>${c.material ? esc(c.material) + ' · ' : ''}${esc(aiUseLabel(c.ai) || 'AI use not stated')}${(c.by || []).length ? ` · <span class="hist-by">${names(c.by)}</span>` : ''}</p></span>
   </li>`).join('')}</ul>`;
 }
 function criteriaBox() {

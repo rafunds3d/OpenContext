@@ -19,11 +19,12 @@ const SITE = {
   license: "CC BY 4.0",           // license of the entries, or "" to hide
   started: "2026-10-03",          // date the database went live (start of the one-year test)
 
-  /* Submissions. With an endpoint, the Submit page sends entries to the submission service in submit/
-     (see README.md, "Submissions"): the sender confirms an institutional e-mail address, and the entry
-     arrives as a pull request that a moderator merges to publish. Without one, the Submit page produces
-     the entry in the fixed format and an e-mail to the moderators. Institutional addresses are recognised
-     from a public list of university domains plus the extra domains below. */
+  /* Submissions. With an endpoint, the Submit page sends entries to the service in submit/ (see README.md,
+     "Submissions"): the sender confirms an institutional e-mail address, and the entry arrives as a pull
+     request that a moderator merges to publish. The same service signs the moderators in, so that they can
+     edit entries and accept submissions on the site (the Moderators link in the footer). Without an endpoint,
+     the Submit page produces the entry in the fixed format and an e-mail to the moderators. Institutional
+     addresses are recognised from a public list of university domains plus the extra domains below. */
   submit: {
     endpoint: "",                 // e.g. "https://opencontext-submit.your-account.workers.dev"
     extraDomains: ["perimeterinstitute.ca", "oeaw.ac.at", "iqoqi-vienna.at", "mpg.de", "cnrs.fr", "cern.ch", "ictp.it", "icfo.eu", "inl.int", "ist.ac.at", "ucl.ac.uk", "cwi.nl", "weizmann.ac.il"]

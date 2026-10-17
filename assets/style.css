@@ -206,6 +206,35 @@ a.stat:hover { text-decoration: none; color: var(--red); }
 .post-title { text-align: center; font-size: 1.35rem; margin: 1.6rem 0 .3rem; }
 .post-meta { text-align: center; font-size: .92rem; color: var(--ink-3); margin-bottom: 1.4rem; }
 
+/* moderation: the Edit buttons a signed-in moderator sees, the Edit form, the queue of submissions */
+.edit-link { display: inline-block; font-family: var(--sans); font-size: .7rem; font-weight: 700; line-height: 1.3; padding: .1rem .5rem; border: 1px solid var(--ink); border-radius: 3px; color: var(--ink); vertical-align: middle; white-space: nowrap; }
+a.edit-link:hover { background: var(--ink); color: #fff; text-decoration: none; }
+.sec-title .edit-link, .post-meta .edit-link, .contrib-meta .edit-link { margin-left: .4rem; }
+.mod-bar { text-align: center; font-size: .95rem; margin: -.6rem 0 1.2rem; }
+.mod-list { columns: 2; column-gap: 2rem; list-style: none; margin: 0; padding: 0; font-size: .95rem; }
+.mod-list li { margin: .15rem 0; break-inside: avoid; }
+.rows-edit { margin: .3rem 0 0; }
+.row-edit { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: .2rem .8rem; align-items: end; border-top: 1px dotted var(--rule-2); padding: .3rem 0 .6rem; }
+.row-edit .field { margin: .3rem 0 0; }
+.row-edit .field label { font-size: .78rem; margin-bottom: .15rem; }
+.row-edit .wide, .row-edit .row-tools { grid-column: 1 / -1; }
+.row-edit .row-tools { margin: .2rem 0 0; text-align: right; }
+.row-edit[data-auto] { background: var(--tan); }
+.linklike.small { font-size: .85rem; color: var(--ink-2); }
+.field .help code { font-size: .85em; }
+.preview { border: 1px dashed var(--rule-2); border-radius: 6px; padding: .6rem 1rem .8rem; margin: 1rem 0; }
+.preview .pbox { margin-top: 1.6rem; }
+.callout.ok { border-left-color: var(--green); background: #f4faf4; }
+.callout.small { font-size: .9rem; padding: .45rem .8rem; }
+.pulls { list-style: none; margin: 0; padding: 0; border-bottom: 1px solid var(--rule); }
+.pull { border-top: 1px solid var(--rule); padding: .7rem 0 .8rem; }
+.pull-title { margin: 0 0 .15rem; font-weight: 700; }
+.pull-title .small { font-weight: 500; }
+.pull-actions { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin: .5rem 0 0; }
+.pull-body, .patch { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 22rem; font-size: .8rem; }
+.pull details summary { cursor: pointer; color: var(--ink-2); }
+.decline-box { margin: .5rem 0 0; }
+
 /* the progress chart */
 .chart-wrap { position: relative; margin: .6rem 0 .4rem; }
 .chart-scroll { overflow-x: auto; }                                   /* on a phone the chart keeps a legible size and scrolls sideways */
@@ -228,6 +257,7 @@ a.stat:hover { text-decoration: none; color: var(--red); }
   .row-meta, .row-q { grid-column: 1 / -1; }
   .goal { grid-template-columns: 3.4rem minmax(0, 1fr); }
   .goal-count { grid-column: 2; }
+  .mod-list { columns: 1; }
   .hist li { grid-template-columns: 1fr; gap: .1rem; }
   .masthead .title { font-size: 1.7rem; }
   .prose p, .prose li, .pbox p, .cbox dl > div, .masthead .abstract { text-align: left; }

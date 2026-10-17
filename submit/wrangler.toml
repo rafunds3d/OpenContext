@@ -13,8 +13,15 @@ MAIL_PROVIDER = "brevo"                                  # "brevo" (verify one s
 MAIL_FROM = "OpenContext <rafael.wagner@uni-ulm.de>"     # the verified sender
 # Institutional domains missing from the public university list, comma-separated. Keep in step with SITE.submit.extraDomains.
 EXTRA_DOMAINS = "perimeterinstitute.ca,oeaw.ac.at,iqoqi-vienna.at,mpg.de,cnrs.fr,cern.ch,ictp.it,icfo.eu,inl.int,ist.ac.at,ucl.ac.uk,cwi.nl,weizmann.ac.il"
+# The moderators, who can sign in on the site (Moderators link in the footer) to edit entries and accept submissions:
+# "Name <address>" entries separated by commas, or bare addresses. The name goes on the commits they make.
+MODERATOR_EMAILS = "Rafael Wagner <rafael.wagner@uni-ulm.de>"
+# What a moderator's save becomes: "direct" commits to GITHUB_BASE at once (the site redeploys in a minute or two);
+# "pull-request" opens a pull request for another moderator to merge. Use "pull-request" if the branch is protected.
+EDIT_MODE = "direct"
 
-# Pending submissions wait here for their confirmation link (24 h), together with the filing locks and the hourly counters.
+# Pending submissions wait here for their confirmation link (24 h), together with the filing locks, the hourly counters,
+# the moderators' sign-in links (15 min) and their sessions (30 days).
 # Create it with `npx wrangler kv namespace create SUBMISSIONS` and paste the id it prints.
 [[kv_namespaces]]
 binding = "SUBMISSIONS"

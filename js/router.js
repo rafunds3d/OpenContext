@@ -53,6 +53,8 @@ function route() {
   else if (path === 'about') { html = viewAbout(); title = 'About'; nav = 'about'; }
   else if (path === 'contribute') { html = viewContribute(); title = 'Contribute'; nav = 'contribute'; }
   else if (path === 'submit') { html = viewSubmit(params); title = 'Submit'; nav = 'contribute'; }
+  else if (path === 'moderate') { html = viewModerate(params); title = 'Moderation'; nav = 'moderate'; }
+  else if (path === 'edit') { html = viewEdit(params); title = 'Edit'; nav = 'moderate'; }
   else if (path === 'random' || path.startsWith('random/')) {
     const status = path.split('/')[1] || '';
     const p = randomProblem(status === 'any' ? '' : (status || 'open'));
@@ -64,9 +66,12 @@ function route() {
   if (window.MathJax && typeof MathJax.typesetClear === 'function') MathJax.typesetClear();
   main.innerHTML = html;
   document.title = title ? `${title} · ${SITE.name}` : `${SITE.name} · ${SITE.subtitle}`;
+  if (typeof initModeration === 'function') initModeration();   // before setNav: it adds the Moderate link for a signed-in moderator
   setNav(nav);
   if (typeof initSubmitForm === 'function') initSubmitForm();
   if (typeof initProgressChart === 'function') initProgressChart();
+  if (typeof initModeratePage === 'function') initModeratePage();
+  if (typeof initEditPage === 'function') initEditPage();
   const to = params.get('to') && document.getElementById(params.get('to'));
   if (to) to.scrollIntoView(); else window.scrollTo(0, 0);
   if (!firstRender) main.focus({ preventScroll: true });

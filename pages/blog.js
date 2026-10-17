@@ -18,11 +18,14 @@ function viewBlog() {
 function viewPost(s) {
   const x = postBySlug(s);
   if (!x) return viewNotFound(`There is no post “${esc(s)}”.`);
-  const g = x.challengeTo ? goalById(x.challengeTo) : null;
   return `<p class="crumb"><a href="#/blog">All posts</a></p>
-  <article class="prose post">
+  ${postArticle(x)}`;
+}
+function postArticle(x) {
+  const g = x.challengeTo ? goalById(x.challengeTo) : null;
+  return `<article class="prose post" data-edit="POSTS:${POSTS.indexOf(x)}">
     <h1 class="post-title">${esc(x.title)}</h1>
-    <p class="post-meta">${fmtDate(x.date)}${(x.by || []).length ? ` · ${names(x.by)}` : ''}${aiUseLabel(x.ai) ? ` · ${esc(aiUseLabel(x.ai))}` : ''}</p>
+    <p class="post-meta" data-edit-slot>${fmtDate(x.date)}${(x.by || []).length ? ` · ${names(x.by)}` : ''}${aiUseLabel(x.ai) ? ` · ${esc(aiUseLabel(x.ai))}` : ''}</p>
     ${g ? `<p class="notice">A challenge to Goal ${g.numeral}, <a href="#/agenda?to=${g.id}">${esc(g.title)}</a>. Challenges state the objection, the assumption or motivation they contest, and what the goal would lose if the objection held. They have no solution and stay open for discussion.</p>` : ''}
     ${x.summary ? `<p><strong>${esc(x.summary)}</strong></p>` : ''}
     ${paras(x.body)}
