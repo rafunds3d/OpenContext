@@ -81,30 +81,46 @@ There is nevertheless a simple sense in which the question can be tackled with e
   },
   {
     number: 3,
-    title: "Sample complexity of theory-independent tomography",
+    title: "Sample complexity of self-consistent entanglement certification",
     status: "open",
     goals: ["applications"],
-    topics: ["Theory-agnostic tomography", "Generalized probabilistic theories", "Sample complexity", "Experimental tests"],
+    topics: ["Entanglement", "Theory-agnostic tomography", "Sample complexity", "Experimental tests"],
     posedBy: [],
     curatedBy: [],
-    statement: tex`Consider theory-independent tomography as introduced and investigated by Mazurek et al. (2021) and Grabowecky et al. (2022). In this context, what is the sample complexity of theory-independent tomography?`,
-    background: tex`Testing nonclassicality via generalized contextuality requires establishing, in some form, the operational equivalences that enter its definition, and it is known that some form of tomography is needed for this [Pusey, del Rio and Meyer 2019; Schmid et al. 2025]. If one wishes to remain agnostic about the underlying theory, in the instrumentalist spirit of operational probabilistic theories, this can be done within the framework of generalized probabilistic theories (GPTs) through theory-agnostic, or GPT, tomography. The approach has been demonstrated experimentally for a photon's polarization degree of freedom [Mazurek et al. 2021] and for a three-level photonic system [Grabowecky et al. 2022].
+    statement: tex`Consider self-consistent entanglement certification via generalized noncontextuality in a bipartite Bell experiment, with known local dimension \(d\) and the tomographic completeness needed to infer local operational identities. What is the minimum total number of copies of the target state required to certify entanglement at trace-distance resolution \(\gamma\), with error probability at most \(\delta\), when the identities must be learned from the same finite experimental data?
 
-Standard quantum state or process tomography has a sample complexity that scales polynomially with the Hilbert-space dimension. It is conceivable that an approach which does not assume any underlying Hilbert space is more demanding still; the problem asks by how much.`,
-    motivation: tex`Generalized contextuality tests have fewer loopholes than Bell or Kochen–Specker tests and can be made robust to noise, yet only a handful of experiments have been reported and most results concern low-dimensional systems, so it is not clear how such tests scale to the high-dimensional systems that can now be controlled. A quantitative answer, in either direction, gives the experimental side of Goal III a concrete target: a polynomial scaling would justify extending theory-agnostic contextuality experiments to larger systems, while a worse scaling would locate the bottleneck and motivate restricted fragments or approximate certification schemes.
+How does this sample complexity depend on \(d\), \(\gamma\), \(\delta\), and the number of distinct local measurement effects? All copies used to infer the identities must count towards the total.`,
+    background: tex`<strong>Statistics.</strong> Alice and Bob share an unknown state \(\rho^{AB}\) on \(\mathbb C^d\otimes\mathbb C^d\). They choose measurement settings \(x,y\) and record outcomes \(a,b\), with probabilities
+\[p(ab\mid xy)=\operatorname{Tr}\!\left[(M^A_{a\mid x}\otimes M^B_{b\mid y})\rho^{AB}\right].\]
+The local effects are positive and satisfy \(\sum_a M^A_{a\mid x}=I_d\) and \(\sum_b M^B_{b\mid y}=I_d\). Their operator representations are not supplied to the protocol. One trial consumes one target copy and records \((x,y,a,b)\); assume independent, identically prepared copies and stationary, memoryless devices.
 
-A complementary question asks for the sample complexity of relative tomography restricted to a fragment, in the sense of Schmid et al. (2025), within quantum theory itself; it is treated as a separate entry.`,
+<strong>Operational identities and the test.</strong> The identities on Alice’s side are the real coefficient vectors
+\[\mathcal O_A:=\left\{\alpha:\sum_{a,x}\alpha_{a,x}M^A_{a\mid x}=0\right\},\]
+and \(\mathcal O_B\) is defined analogously. A generalized noncontextual model must reproduce the statistics as
+\[p(ab\mid xy)=\sum_{\lambda_A,\lambda_B}\mu(\lambda_A,\lambda_B)\,\xi_A(a\mid x,\lambda_A)\,\xi_B(b\mid y,\lambda_B),\]
+where \(\mu\) is a probability distribution and the local response functions \(\xi_A,\xi_B\) are nonnegative, normalized for each setting, and preserve every local operational identity:
+\[\sum_{a,x}\alpha_{a,x}\xi_A(a\mid x,\lambda_A)=0\qquad\forall\alpha\in\mathcal O_A,\ \forall\lambda_A,\]
+with the analogous constraint for Bob. Let \(\mathcal{NC}(\mathcal O_A,\mathcal O_B)\) denote the polytope of statistics admitting such a model. For fixed identities, membership can be tested by linear programming. Every separable state produces statistics in this polytope, so establishing \(p\notin\mathcal{NC}(\mathcal O_A,\mathcal O_B)\) certifies entanglement [Zhang 2026, Section II].
+
+<strong>Finite-sample task.</strong> Define the trace-distance entanglement by
+\[E_{\mathrm{tr}}(\rho):=\min_{\sigma\in\mathrm{Sep}}\frac12\|\rho-\sigma\|_1,\]
+where \(\mathrm{Sep}\) is the set of separable states. A protocol returns either “certify” or “inconclusive” and must satisfy
+\[\begin{aligned}
+\Pr(\mathsf{certify})&\leq\delta &&\text{if }p\in\mathcal{NC}(\mathcal O_A,\mathcal O_B),\\
+\Pr(\mathsf{certify})&\geq1-\delta &&\text{if }E_{\mathrm{tr}}(\rho^{AB})\geq\gamma.
+\end{aligned}\]
+The measurement family must be sufficiently rich to achieve the desired resolution with exact data. The tomographic-completeness assumption ensures that the linear relations visible in the exact probability table identify the relevant local operational identities. With finite data, both the probabilities and the identities are uncertain: the test must account for both, rather than impose estimated identities as exact. All trials used for this inference count towards the sample budget; any further assumptions needed for stable inference should be explicit.
+
+For suitable local projective measurement families, when the exact identities are supplied independently, the optimal target-copy cost at fixed \(d\) is \(\Theta_d(\gamma^{-2}\log(1/\delta))\) [Zhang 2026, Section V]. The open question is the additional cost of learning those identities, including whether the number of distinct effects enters the sample complexity.`,
+    motivation: tex`This problem gives theory-independent tomography a concrete experimental objective: a reliable entanglement certificate obtained through generalized noncontextuality. Measuring performance by the certification verdict avoids choosing a distance between gauge-dependent reconstructions. A solution would clarify the statistical cost of learning operational identities and provide a starting point for studying other applications of generalized contextuality.`,
     history: [
-      { date: "2026-10-03", kind: "posed", text: "Entry created from Problem III of the companion paper.", by: [] }
+      { date: "2026-10-03", kind: "posed", text: "Entry created from Problem III of the companion paper.", by: [] },
+      { date: "2026-10-17", kind: "note", text: "Reformulated around the sample complexity of self-consistent entanglement certification via generalized noncontextuality, following Sections II and V–VI of Zhang (2026). Prepared with Codex assistance.", by: ["Yujie Zhang"] }
     ],
     references: [
-      { text: "M. D. Mazurek, M. F. Pusey, K. J. Resch and R. W. Spekkens, Experimentally bounding deviations from quantum theory in the landscape of generalized probabilistic theories, PRX Quantum 2, 020302 (2021)", url: "" },
-      { text: "M. J. Grabowecky, C. A. J. Pollack, A. R. Cameron, R. W. Spekkens and K. J. Resch, Experimentally bounding deviations from quantum theory for a photonic three-level system using theory-agnostic tomography, Phys. Rev. A 105, 032204 (2022)", url: "" },
-      { text: "D. Schmid, J. H. Selby, V. P. Rossi, R. D. Baldijão and A. B. Sainz, Shadows and subsystems of generalized probabilistic theories: when tomographic incompleteness is not a loophole for contextuality proofs, Quantum 9, 1880 (2025)", url: "" },
-      { text: "M. F. Pusey, L. del Rio and B. Meyer, Contextuality without access to a tomographically complete set (2019)", url: "https://arxiv.org/abs/1904.08699" },
-      { text: "S. T. Flammia, D. Gross, Y.-K. Liu and J. Eisert, Quantum tomography via compressed sensing: error bounds, sample complexity and efficient estimators, New J. Phys. 14, 095022 (2012)", url: "" },
-      { text: "H. Yuen, An improved sample complexity lower bound for (fidelity) quantum state tomography, Quantum 7, 890 (2023)", url: "" },
-      { text: "T. Scharnhorst, J. Spilecki and J. Wright, Optimal lower bounds for quantum state tomography (2025)", url: "https://arxiv.org/abs/2510.07699" }
+      { text: "Y. Zhang, Complexity of self-consistent entanglement certification (2026), Sections II and V–VI", url: "https://arxiv.org/abs/2610.08757" },
+      { text: "M. D. Mazurek, M. F. Pusey, K. J. Resch and R. W. Spekkens, Experimentally bounding deviations from quantum theory in the landscape of generalized probabilistic theories, PRX Quantum 2, 020302 (2021)", url: "https://doi.org/10.1103/PRXQuantum.2.020302" },
+      { text: "M. J. Grabowecky, C. A. J. Pollack, A. R. Cameron, R. W. Spekkens and K. J. Resch, Experimentally bounding deviations from quantum theory for a photonic three-level system using theory-agnostic tomography, Phys. Rev. A 105, 032204 (2022)", url: "https://doi.org/10.1103/PhysRevA.105.032204" }
     ]
   }
 ];
