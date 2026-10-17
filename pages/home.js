@@ -19,14 +19,14 @@ function viewHome() {
     <a class="stat" href="#/problems"><strong>${PROBLEMS.length}</strong><span>${PROBLEMS.length === 1 ? 'problem' : 'problems'}</span></a>
     <a class="stat" href="#/problems?status=open"><strong>${open}</strong><span>open</span></a>
     ${revising ? `<a class="stat" href="#/problems?status=under-revision"><strong>${revising}</strong><span>under revision</span></a>` : ''}
-    <a class="stat" href="#/problems?status=closed"><strong>${closed}</strong><span>resolved</span></a>
+    <a class="stat" href="#/problems?status=closed"><strong>${closed}</strong><span>solved</span></a>
   </nav>
   <form class="search" id="search-form" role="search">
     <label for="q" class="visually-hidden">Search problems</label>
     <input id="q" name="q" type="search" placeholder="Search problems" autocomplete="off">
     <button class="btn" type="submit">Search</button>
   </form>
-  <p class="hint">Press <kbd>/</kbd> to start typing. ${latest() ? 'Last update ' + fmtDate(latest()) + '.' : ''}</p>
+  <p class="hint">Press <kbd>/</kbd> to start typing. ${latest() ? 'Last update ' + fmtDate(latest()) + '.' : ''} <a href="#/progress">Progress over time →</a></p>
 
   <h2 class="sec-title">I. Organizing research goals</h2>
   <p class="muted small" style="text-align:justify;hyphens:auto;-webkit-hyphens:auto;margin-top:-.4rem">For this first cycle (${esc(SITE.edition || SITE.name)}) three long-term goals organize the list. We remark that the division into broad goals is a matter of motivation and organization, rather than a fixed verdict on what is worth pursuing. Within this organization scheme, every problem traces back to one goal. Golden apples mark the broad goals motivated in our companion paper for OpenContext I. Red apples mark, instead, the near-term problems that grow from them. Later cycles may be organized around other broad directions, which anyone can propose on the <a href="#/future-goals">future broad goals</a> page. </p>

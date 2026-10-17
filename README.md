@@ -2,23 +2,27 @@
 
 A community-curated, open database of near-term problems in generalized contextuality, each traceable to a long-term goal of the field's research agenda. It is the proof-of-concept database of the perspective *Accelerating research through skilled humans collaborating with AI agents: A case study in quantum foundations*.
 
-This is a simple website specifically designed for the case-study, dubbed OpenContext I. Future work will gather new problems for OpenContex II as well as an analysis of organization (and other) issues.
+This is a simple website specifically designed for the case study, dubbed OpenContext I. Future work will gather new problems for OpenContext II as well as an analysis of organizational (and other) issues.
 
-This website was constructed with substantial help of Fable 5.1. 
+This website was constructed with substantial help of Fable 5.1.
 
 ## Website structure
 
 ```
-index.html          the page shell: head, header, footer, the apple icon, the list of scripts
-assets/style.css    the look: colours and type at the top, then one block per part of the site
-data/site.js        name, byline, abstract, companion paper, repository, moderators, license
-data/goals.js       the research agenda (goals I–III) and the status vocabulary
-data/problems.js    one entry per problem — the file you will edit most
-pages/home.js       one file per page: each defines a function that returns the page's HTML
-pages/problems.js     (the list)      pages/problem.js  (a single problem)
-pages/agenda.js       pages/tags.js   pages/about.js    pages/contribute.js
-js/lib.js           shared pieces: apples, status labels, rows, the red and tan boxes, templates
-js/router.js        turns #/problems, #/problem/3, … into calls of the page functions; loaded last
+index.html             the page shell: head, header, footer, the apple icon, the list of scripts
+assets/style.css       the look: colours and type at the top, then one block per part of the site
+data/site.js           name, byline, abstract, companion paper, repository, moderators, license, submission settings
+data/goals.js          the research agenda (goals I–III), the status vocabulary, proposals for future broad goals
+data/problems.js       one entry per problem — the file you will edit most
+data/contributions.js  material attached to entries (claims, partial results, verifications, expositions, …)
+data/posts.js          blog posts
+pages/home.js          one file per page: each defines a function that returns the page's HTML
+pages/problems.js        (the list)        pages/problem.js     (a single problem)
+pages/agenda.js          pages/future-goals.js   pages/tags.js   pages/progress.js  (the status timeline)
+pages/blog.js            pages/guidelines.js     pages/about.js  pages/contribute.js  pages/submit.js
+js/lib.js              shared pieces: apples, status labels, rows, the red and tan boxes, templates, the submission format
+js/router.js           turns #/problems, #/problem/3, … into calls of the page functions; loaded last
+submit/                the submission service: a Cloudflare Worker that turns a submission into a pull request (see below)
 ```
 
 ## Editing
@@ -46,12 +50,31 @@ Use a branch and a pull request for changes you want someone else to look at fir
 
 Each entry in `data/problems.js` has:
 
-- `number`, `title`, `status` (`open`, `proved`, `disproved`, `under-revision`, `complete`), `goals` (ids from `data/goals.js`), `topics`;
-- `posedBy` and `curatedBy` (names), `statement`, `background`, `motivation`, and an optional `notice` shown as a callout;
-- `history`: dated entries of kind `posed`, `status`, `advance`, `interest` or `note`, each with the people involved and an optional link. The newest `status` entry sets the date the current status has held since; the newest entry of any kind sets "last updated";
+- `number`, `title`, `status` (`open`, `under-revision`, `solved`), `goals` (ids from `data/goals.js`), `topics`;
+- `posedBy` and `curatedBy` (names), optionally `ai` (`none`, `partial`, `full`: how much AI assistance went into posing it);
+- `statement`, `background`, and, following the curation criteria of the paper's BOX I, `relevance` (how the problem is motivated within the literature and which goals it traces to) and `significance` (how its resolution would advance those goals); an optional `notice` shown as a callout;
+- `history`: dated entries of kind `posed`, `status`, `advance`, `interest` or `note`, each with the people involved and an optional link. A `status` entry carries `to: "under-revision"` or `to: "solved"` (or `to: "open"` when a problem is reopened); the newest one sets the date the current status has held since, and together they draw the progress chart. The newest entry of any kind sets "last updated";
 - `references`, each with an optional link.
 
-The Contribute page of the site shows a copy-paste template for a new entry and for a progress entry. Counts, goal pages, topic pages, search, the random problem, "recently updated", the citation text and the JSON export are all generated from the data files.
+Keep the line `/* new problems are added above this line */` at the end of the list: the submission service inserts entries there.
+
+## Contributions, posts, directions
+
+Material attached to an entry lives in `data/contributions.js`, one record per contribution in the fixed format of the paper: `problem`, `date`, `kind` (a key of `CONTRIBUTION_KINDS`: `claim`, `partial`, `negative`, `reformulation`, `decomposition`, `evidence`, `verification`, `exposition`, `challenge`, `question`, `comment`), `title`, `material` (the type of material), `ai` (a key of `AI_USE`), `by` (names), `provisional`, `summary`, `url`. The problem page lists them, shows for a problem under revision the date of the claim and the number of verifications and expositions received since, and credits "advanced by", "verified by" and "explained by" from them.
+
+Blog posts live in `data/posts.js` (`slug`, `title`, `date`, `by`, `ai`, `challengeTo` for a challenge to a goal, `problems`, `summary`, `body`). Proposals for broad directions live in `FUTURE_GOALS` in `data/goals.js`. Each list ends with a "new … are added above this line" comment for the same reason as above.
+
+The Contribute page shows copy-paste templates for a problem and for a contribution. Counts, goal pages, topic pages, search, the random problem, "recently updated", the progress chart, the citation text and the JSON export are all generated from the data files.
+
+## Statuses
+
+As in the paper: a problem enters as `open`; a claimed solution places it `under-revision`; it becomes `solved` on a peer-reviewed publication or on independent verification by three researchers, and can return to an earlier status on a substantiated challenge or when the claim is withdrawn. The rules are spelled out on the Guidelines page (`pages/guidelines.js`). Record each change as a dated `status` entry in the problem's history with the new status in `to`, and the Progress page draws the counts over time from those dates.
+
+## Submissions
+
+Researchers submit through the Submit page (`pages/submit.js`), which asks for an institutional e-mail address and the name of at least one human contributor, and records the type of material and the extent of AI use. With `SITE.submit.endpoint` set in `data/site.js`, the form posts to the service in `submit/`: it e-mails a confirmation link, and when the link is opened it appends the entry to the right data file on a new branch and opens a pull request, so that accepting a submission is merging it. A claimed solution also places the problem under revision in the same pull request. Setting the service up takes a free Cloudflare account, a GitHub token and an e-mail sending account; the steps are in [`submit/README.md`](submit/README.md). Without the endpoint, the Submit page produces the entry in the fixed format together with an e-mail to the moderators, who paste it in.
+
+Free-mail providers are refused. Domains ending in `.edu`, `.edu.xx` or `.ac.xx` are accepted at once; others are looked up in a public list of university domains plus the `extraDomains` in `data/site.js` (and `EXTRA_DOMAINS` in `submit/wrangler.toml`), which is where to add an institute the list lacks.
 
 ## Math
 
@@ -69,4 +92,4 @@ The empty `.nojekyll` file tells GitHub Pages to serve the files as they are.
 
 ## The apples
 
-Golden apples mark the long-term goals, red apples the open problems, an outlined apple a problem under revision, and a grey apple a resolved one, following the tree in the paper's figures. They are a single inline SVG symbol (`#i-apple`) in `index.html`, recoloured with CSS variables in `assets/style.css`.
+Golden apples mark the long-term goals, red apples the open problems, an outlined apple a problem under revision, and a grey apple a solved one, following the tree in the paper's figures. They are a single inline SVG symbol (`#i-apple`) in `index.html`, recoloured with CSS variables in `assets/style.css`.

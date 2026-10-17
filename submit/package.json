@@ -1,0 +1,14 @@
+{
+  "name": "opencontext-submit",
+  "private": true,
+  "type": "module",
+  "description": "Submission service for the OpenContext site: confirms an institutional e-mail address, then files the submission as a pull request.",
+  "scripts": {
+    "test": "node test.mjs",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4"
+  }
+}

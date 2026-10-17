@@ -28,7 +28,7 @@ function viewProblems(params) {
     <label for="sort" class="visually-hidden">Sort by</label>
     <select id="sort" name="sort">${q ? opt('relevance', 'Relevance') : ''}${opt('number', 'By number')}${opt('date', 'Recently updated')}</select>
   </form>
-  <nav class="tabs" aria-label="Filter by status">${tab('all', 'All')}${tab('open', apple() + 'Open')}${tab('under-revision', apple('apple-revision') + 'Under revision')}${tab('closed', apple('apple-done') + 'Resolved')}</nav>
+  <nav class="tabs" aria-label="Filter by status">${tab('all', 'All')}${tab('open', apple() + 'Open')}${tab('under-revision', apple('apple-revision') + 'Under revision')}${tab('closed', apple('apple-done') + 'Solved')}</nav>
   <div class="filters"><span>Goal:</span> ${gfilter} ${goal ? `<a class="small" href="${link({ status, goal: '', q, sort: sortParam })}">clear</a>` : ''}</div>
   ${q ? `<p class="muted small">${list.length} ${list.length === 1 ? 'result' : 'results'} for “${esc(q)}”. <a href="${link({ status, goal })}">Clear search</a></p>` : ''}
   ${rows(list, { empty, since: true })}`;

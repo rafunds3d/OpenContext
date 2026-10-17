@@ -125,7 +125,7 @@ mjx-container[display="true"] { margin: .9em 0 !important; }
 .pbox .more { text-align: right; margin: .9rem 0 0; font-size: .95rem; }
 .pbox h3 { font-size: 1.05rem; margin: 0 0 .5rem; }
 
-/* apple icons: red = open problem, outline = under revision, grey = resolved, golden = long-term goal */
+/* apple icons: red = open problem, outline = under revision, grey = solved, golden = long-term goal */
 .apple { width: 1.05em; height: 1.05em; vertical-align: -.16em; flex: none; --apple-body: #c00808; --apple-leaf: #3f8f3f; --apple-stem: #5a3a1a; --apple-stroke: none; }
 .apple-goal { --apple-body: #e6b422; }
 .apple-revision { --apple-body: #fff; --apple-stroke: #c00808; }
@@ -138,8 +138,7 @@ mjx-container[display="true"] { margin: .9em 0 !important; }
 /* status labels, set like \texttt{} in the paper */
 .st { font-family: var(--mono); font-size: .82rem; border: 1px solid currentColor; border-radius: 3px; padding: .02rem .4rem; white-space: nowrap; line-height: 1.5; }
 .st-open { color: var(--ink-2); }
-.st-proved, .st-complete { color: var(--green); }
-.st-disproved { color: var(--red); }
+.st-solved { color: var(--green); }
 .st-under-revision { color: var(--blue); }
 .gchip { font-weight: 700; font-size: .85rem; border: 1px solid var(--ink); border-radius: 3px; padding: 0 .35rem; color: var(--ink); white-space: nowrap; }
 .gchip:hover { text-decoration: none; background: var(--ink); color: #fff; }
@@ -181,6 +180,49 @@ mjx-container[display="true"] { margin: .9em 0 !important; }
 .toc li { display: flex; justify-content: space-between; gap: 1rem; padding: .15rem 0; }
 .toc a { color: var(--ink); }
 .toc .pg { color: var(--red); }
+
+/* forms (the Submit page), set like the search box */
+.form { margin: 1.4rem 0 0; }
+.form fieldset { border: 1px solid var(--rule); border-radius: 4px; padding: .5rem 1rem 1rem; margin: 0 0 1.2rem; min-width: 0; }
+.form legend { font-family: var(--sans); font-weight: 700; font-size: .85rem; padding: 0 .4rem; }
+.form fieldset[hidden] { display: none; }
+.field { margin: .75rem 0 0; }
+.field label, .field .label { display: block; font-family: var(--sans); font-weight: 700; font-size: .85rem; margin-bottom: .25rem; }
+.field label.check, .checks label { display: block; font-family: var(--serif); font-weight: 500; font-size: 1rem; margin: .25rem 0; }
+.field label.check input, .checks label input { margin-right: .4rem; }
+.field input[type="text"], .field input[type="email"], .field input[type="url"], .field textarea, .field select { display: block; width: 100%; font: inherit; font-size: 1rem; padding: .45rem .7rem; border: 1px solid var(--ink); border-radius: 3px; background: #fff; color: var(--ink); }
+.field textarea { font-family: var(--mono); font-size: .9rem; line-height: 1.45; resize: vertical; }
+.field .help { font-size: .88rem; color: var(--ink-3); margin: .3rem 0 0; }
+.field .help .good { color: var(--green); }
+.field .help .bad { color: var(--red); }
+.field .help .warn { color: var(--brown); }
+.form-actions { margin: 1rem 0 0; display: flex; gap: .8rem; align-items: center; flex-wrap: wrap; }
+.hp { position: absolute; left: -999px; width: 1px; height: 1px; opacity: 0; }
+.callout { border-left: 3px solid var(--green); background: #f4faf4; padding: .6rem .9rem; margin: 1rem 0 1.2rem; font-size: .98rem; }
+.callout.err { border-left-color: var(--red); background: var(--red-tint); }
+.callout[hidden] { display: none; }
+
+/* contributions and posts */
+.flag { font-family: var(--mono); font-size: .78rem; color: var(--brown); border: 1px solid currentColor; border-radius: 3px; padding: 0 .35rem; margin-left: .3rem; }
+.contrib-sum { margin: .3rem 0 0; font-size: .98rem; }
+.contrib-sum p { margin: 0 0 .5rem; }
+.contrib-meta { margin: .1rem 0 0; font-size: .9rem; color: var(--ink-3); }
+.post-title { text-align: center; font-size: 1.35rem; margin: 1.6rem 0 .3rem; }
+.post-meta { text-align: center; font-size: .92rem; color: var(--ink-3); margin-bottom: 1.4rem; }
+
+/* the progress chart */
+.chart-wrap { position: relative; margin: .6rem 0 .4rem; }
+.chart { width: 100%; height: auto; display: block; font-family: var(--sans); }
+.chart text { font-size: 11px; fill: var(--ink-2); }
+.chart .grid { stroke: var(--rule); stroke-width: 1; }
+.chart .axis { stroke: var(--rule-2); stroke-width: 1; }
+.chart .series { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.chart .leader { stroke: var(--rule-2); stroke-width: 1; }
+.chart .cross { stroke: var(--ink-3); stroke-width: 1; pointer-events: none; }
+.chart-tip { position: absolute; pointer-events: none; background: #fff; border: 1px solid var(--ink); border-radius: 3px; padding: .35rem .6rem; font-family: var(--sans); font-size: .82rem; line-height: 1.5; color: var(--ink); white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,.12); z-index: 2; }
+.chart-tip[hidden] { display: none; }
+.legend { display: flex; flex-wrap: wrap; gap: .3rem 1.2rem; justify-content: center; font-family: var(--sans); font-size: .85rem; color: var(--ink-2); margin: -.4rem 0 0; }
+.legend i, .chart-tip i { display: inline-block; width: 1.1em; height: 3px; vertical-align: middle; margin-right: .45em; border-radius: 2px; }
 
 @media (max-width: 640px) {
   body { font-size: 1.05rem; }

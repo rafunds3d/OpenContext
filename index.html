@@ -21,7 +21,7 @@ window.MathJax = {
     inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']],
     macros: { ket: ['|#1\\rangle', 1], bra: ['\\langle #1|', 1], braket: ['\\langle #1\\rangle', 1] }
   },
-  options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code', 'kbd'] }
+  options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code', 'kbd', 'input', 'select', 'option'] }
 };
 </script>
 <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
@@ -44,6 +44,9 @@ window.MathJax = {
       <a href="#/problems" data-nav="problems">Problems</a>
       <a href="#/agenda" data-nav="agenda">Agenda</a>
       <a href="#/tags" data-nav="tags">Tags</a>
+      <a href="#/progress" data-nav="progress">Progress</a>
+      <a href="#/blog" data-nav="blog">Blog</a>
+      <a href="#/guidelines" data-nav="guidelines">Guidelines</a>
       <a href="#/about" data-nav="about">About</a>
       <a href="#/contribute" data-nav="contribute">Contribute</a>
       <a href="#" data-paper rel="noopener">Paper</a>
@@ -62,8 +65,12 @@ window.MathJax = {
         <li><a href="#/problems">All problems</a></li>
         <li><a href="#/agenda">Research agenda</a></li>
         <li><a href="#/future-goals">Future broad goals</a></li>
+        <li><a href="#/progress">Progress over time</a></li>
+        <li><a href="#/blog">Blog</a></li>
+        <li><a href="#/guidelines">Guidelines</a></li>
         <li><a href="#/about">About and how to cite</a></li>
         <li><a href="#/contribute">Contribute</a></li>
+        <li><a href="#/submit">Submit</a></li>
         <li><button class="linklike" type="button" data-json>Data as JSON</button></li>
         <li><a href="#" data-repo rel="noopener">Source repository</a></li>
       </ul>
@@ -79,6 +86,8 @@ window.MathJax = {
 <script src="data/site.js"></script>
 <script src="data/goals.js"></script>
 <script src="data/problems.js"></script>
+<script src="data/contributions.js"></script>
+<script src="data/posts.js"></script>
 
 <!-- 2. Machinery and pages -->
 <script src="js/lib.js"></script>
@@ -88,8 +97,12 @@ window.MathJax = {
 <script src="pages/agenda.js"></script>
 <script src="pages/future-goals.js"></script>
 <script src="pages/tags.js"></script>
+<script src="pages/progress.js"></script>
+<script src="pages/blog.js"></script>
+<script src="pages/guidelines.js"></script>
 <script src="pages/about.js"></script>
 <script src="pages/contribute.js"></script>
+<script src="pages/submit.js"></script>
 <script src="js/router.js"></script>
 </body>
 </html>
