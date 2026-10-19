@@ -290,9 +290,13 @@ export function insertBeforeMarker(src, marker, text) {
   const i = structural(src).indexOf(marker);
   if (i < 0) throw fail(`The data file has no “${marker}” line.`, 500);
   const lineStart = src.lastIndexOf('\n', i) + 1;
-  return src.slice(0, lineStart) + text + src.slice(lineStart);
+  /* the entry before the marker may lack its trailing comma (hand edits often do); add it, after that entry */
+  const before = structural(src.slice(0, lineStart), true), last = before.search(/\S\s*$/), prev = last < 0 ? '' : before[last];
+  const comma = prev && prev !== ',' && prev !== '[' ? last + 1 : -1;
+  const head = comma < 0 ? src.slice(0, lineStart) : src.slice(0, comma) + ',' + src.slice(comma, lineStart);
+  return head + text + src.slice(lineStart);
 }
-export const nextProblemNumber = src => Math.max(0, ...[...structural(src, true).matchAll(/\n    number: (\d+),/g)].map(m => Number(m[1]))) + 1;
+export const nextProblemNumber = src => Math.max(0, ...[...structural(src, true).matchAll(/\n\s*number: (\d+)\s*,/g)].map(m => Number(m[1]))) + 1;
 export function uniqueSlug(base, src) {
   const taken = new Set(fieldValues(src, structural(src, true), 'slug').map(x => x.value));
   let s = base || 'post', i = 2;
@@ -487,9 +491,8 @@ async function moderate(request, env, url) {
   if (route === '/entry' && get) {
     const { list, index } = where(url.searchParams.get('list'), url.searchParams.get('index'));
     const file = await readFile(env, LISTS[list], ghRepo(env).base);
-    const f = entryAt(file.text, list, index);
-    if (!f) throw fail('There is no such entry in the repository any more; reload the page.', 409);
-    return { ok: true, list, index, file: LISTS[list], source: f.text };
+    const at = locate(file.text, list, index, url.searchParams.get('key'));
+    return { ok: true, list, index: at, file: LISTS[list], source: entryAt(file.text, list, at).text };
   }
   if (route === '/edit' && post) {
     const { list, index } = where(body.list, body.index);
@@ -508,9 +511,10 @@ async function moderate(request, env, url) {
     const { list } = where(body.list, 0);
     if (list === 'GOALS') throw fail('Goals are added by editing data/goals.js.');
     let entry = validateEntry(body.entry, list, true);
+    const slugBase = list === 'POSTS' ? slugify(entry.slug || entry.title).slice(0, 60) : '';
     const result = await publish(env, mod, LISTS[list], text => {
       if (list === 'PROBLEMS') { const { number, ...rest } = entry; entry = { number: nextProblemNumber(text), ...rest }; }
-      if (list === 'POSTS') entry.slug = uniqueSlug(slugify(entry.slug || entry.title).slice(0, 60), text);
+      if (list === 'POSTS') { const { slug, ...rest } = entry; entry = { slug: uniqueSlug(slugBase, text), ...rest }; }
       return insertBeforeMarker(text, MARKERS[list], '  ' + serializeEntry(entry) + ',\n');
     }, () => `Add ${describe(list, k => entry[k])}`);
     return { ok: true, entry, ...result };
@@ -536,18 +540,20 @@ async function moderate(request, env, url) {
   if (route === '/pr' && get) {
     const n = prNumber(url.searchParams.get('number'));
     const [pr, files] = await Promise.all([gh(env, 'GET', `/repos/${repo}/pulls/${n}`), gh(env, 'GET', `/repos/${repo}/pulls/${n}/files?per_page=30`)]);
-    return { ok: true, pull: { ...prSummary(pr, env), state: pr.state, merged: !!pr.merged, mergeable: pr.mergeable, files: files.map(f => ({ path: f.filename, status: f.status, additions: f.additions, deletions: f.deletions, patch: String(f.patch || '').slice(0, 30000) })) } };
+    const mb = files.some(f => Object.values(LISTS).includes(f.filename)) ? await mergeBase(env, pr) : null;
+    const shown = await Promise.all(files.map(async f => ({ path: f.filename, status: f.status, additions: f.additions, deletions: f.deletions, patch: String(f.patch || '').slice(0, 30000), entries: (await changedEntries(env, pr, f.filename, mb)).map(({ list, source }) => ({ list, source })) })));
+    return { ok: true, pull: { ...prSummary(pr, env), state: pr.state, merged: !!pr.merged, mergeable: pr.mergeable, files: shown } };
   }
   if (route === '/accept' && post) {
     const n = prNumber(body.number);
     const pr = await gh(env, 'GET', `/repos/${repo}/pulls/${n}`);
     if (pr.state !== 'open') throw fail('This pull request is no longer open.', 409);
-    let merged;
+    let merged, applied = null;
     try { merged = await gh(env, 'PUT', `/repos/${repo}/pulls/${n}/merge`, { merge_method: 'squash' }); }
-    catch (e) { if (e.ghStatus === 405 || e.ghStatus === 409) throw fail('GitHub cannot merge this pull request by itself (a conflict, or a failing check); open it on GitHub to resolve that.', 409); throw e; }
+    catch (e) { if (e.ghStatus !== 405 && e.ghStatus !== 409) throw e; applied = await applyEntries(env, mod, pr); }
     await deleteBranch(env, pr);
-    console.log(`moderation: ${mod.email} accepted #${n} (${pr.title})`);
-    return { ok: true, sha: merged.sha, url: pr.html_url };
+    console.log(`moderation: ${mod.email} accepted #${n} (${pr.title})${applied ? ' by placing its entries' : ''}`);
+    return { ok: true, sha: merged ? merged.sha : undefined, url: pr.html_url, ...(applied ? { applied } : {}) };
   }
   if (route === '/decline' && post) {
     const n = prNumber(body.number), reason = clean(body.reason, 2000);
@@ -567,6 +573,29 @@ function where(list, index) {
   if (!(Number.isInteger(i) && i >= 0 && i < 100000)) throw fail('Malformed entry index.');
   return { list: String(list), index: i };
 }
+/* The entry the moderator opened. The browser names it by its index in the list it loaded and by what identifies it
+   (a problem's number, a post's slug, a goal's id, a contribution's problem, date and title, a direction's title); when
+   the repository has moved on since the site was deployed, the entry is found by the latter. */
+function identity(list, get) {
+  return list === 'PROBLEMS' ? { number: get('number') } : list === 'POSTS' ? { slug: get('slug') } : list === 'GOALS' ? { id: get('id') }
+    : list === 'CONTRIBUTIONS' ? { problem: get('problem'), date: get('date'), title: get('title') } : { title: get('title') };
+}
+export function locate(text, list, index, keyJson) {
+  let key = null;
+  if (keyJson) { try { key = JSON.parse(keyJson); } catch (e) { key = null; } }
+  if (!key || typeof key !== 'object' || Array.isArray(key) || !Object.values(key).every(v => ['string', 'number'].includes(typeof v))) key = null;
+  const spans = entrySpans(structural(text, true), list) || [];
+  const same = i => { const f = entryAt(text, list, i), id = identity(list, k => fieldLiteral(text, f, k)); return Object.keys(id).every(k => String(id[k] ?? '') === String(key[k] ?? '')); };
+  if (key && index < spans.length && same(index)) return index;
+  if (key) {
+    const hits = spans.map((s, i) => i).filter(same);
+    if (hits.length === 1) return hits[0];
+    if (hits.length > 1) throw fail('Several entries in the repository look like this one; edit the file on GitHub.', 409);
+    throw fail('This entry is not in the repository where the page expects it: the public site may be behind the repository, or the entry was changed or removed. Reload the page and try again.', 409);
+  }
+  if (index >= spans.length) throw fail('There is no such entry in the repository any more; reload the page.', 409);
+  return index;
+}
 /* the entry at `index`, provided it still reads as it did when the moderator opened it */
 function current(text, list, index, was) {
   const f = entryAt(text, list, index);
@@ -583,6 +612,64 @@ function describe(list, get) {
   return `Goal ${get('numeral') ?? ''}: ${t}`;
 }
 const prNumber = n => { const i = Number(n); if (!(Number.isInteger(i) && i > 0)) throw fail('Malformed pull request number.'); return i; };
+/* the commit a pull request is compared against: the last one its branch and the base branch share */
+async function mergeBase(env, pr) {
+  try { const c = await gh(env, 'GET', `/repos/${ghRepo(env).repo}/compare/${encodeURIComponent(pr.base.ref)}...${encodeURIComponent(pr.head.sha)}`); return (c.merge_base_commit && c.merge_base_commit.sha) || pr.base.sha; }
+  catch (e) { return pr.base && pr.base.sha; }
+}
+/* The entries a pull request adds or changes in a data file, as text: those of its version of the file that the commit it
+   is compared against lacks. The site shows them as they will appear; a diff cannot serve, since its added lines may
+   split an entry. The pull request's commits are read from this repository, where GitHub keeps them, or from the fork. */
+async function changedEntries(env, pr, path, mergeBase) {
+  const names = Object.keys(LISTS).filter(k => LISTS[k] === path);
+  const from = pr.head && pr.head.repo && pr.head.repo.full_name, at = pr.head && pr.head.sha;
+  if (!names.length || !/^[\w.-]+$/.test(String(at)) || !/^[\w.-]+$/.test(String(mergeBase))) return [];
+  try {
+    const fromFork = () => /^[\w.-]+\/[\w.-]+$/.test(String(from)) ? gh(env, 'GET', `/repos/${from}/contents/${path}?ref=${encodeURIComponent(at)}`).then(f => b64decode(f.content)) : Promise.reject(new Error('no fork'));
+    const [head, base] = await Promise.all([readFile(env, path, at).then(f => f.text).catch(fromFork), readFile(env, path, mergeBase).then(f => f.text).catch(() => '')]);   // a file the pull request adds has no base
+    const hs = structural(head, true), bs = structural(base, true), out = [];
+    const idOf = (src, name, f) => JSON.stringify(identity(name, k => fieldLiteral(src, f, k)));
+    for (const name of names) {
+      const had = new Map();   // what the base had, by identity
+      for (let i = 0, f; (f = entryAt(base, name, i, bs)); i++) had.set(idOf(base, name, f), f.text);
+      for (let i = 0, f; (f = entryAt(head, name, i, hs)); i++) { const was = had.get(idOf(head, name, f)) ?? null; if (f.text !== was) out.push({ list: name, source: f.text.slice(0, 60000), was }); }
+    }
+    return out.slice(0, 20);
+  } catch (e) { return []; }   // a fork that cannot be read, or a file that cannot be parsed: the diff is still shown
+}
+/* When GitHub cannot merge a pull request by itself, which happens whenever two submissions add their lines at the same
+   place, the site places what the pull request adds or changes onto the current files, as a commit by the moderator:
+   new entries go before the marker; a changed entry replaces the entry it changed, provided nobody else changed that
+   one in the meantime. Anything else (a change outside the data files, say) is left to GitHub. */
+async function applyEntries(env, mod, pr) {
+  const { repo } = ghRepo(env);
+  const cannot = () => fail('GitHub cannot merge this pull request by itself (a conflict, or a failing check), and it changes more than whole entries of the data files; open it on GitHub to resolve that.', 409);
+  if (editMode(env) === 'pull-request') throw cannot();
+  const files = await gh(env, 'GET', `/repos/${repo}/pulls/${pr.number}/files?per_page=30`);
+  const paths = files.map(f => f.filename);
+  if (!paths.length || !paths.every(p => Object.values(LISTS).includes(p))) throw cannot();
+  const mb = await mergeBase(env, pr), commits = [];
+  for (const path of paths) {
+    const entries = await changedEntries(env, pr, path, mb);
+    if (!entries.length) throw cannot();
+    const r = await publish(env, mod, path, text => {
+      let out = text;
+      for (const { list, source, was } of entries) {
+        if (was === null) { if (!MARKERS[list]) throw cannot(); out = insertBeforeMarker(out, MARKERS[list], '  ' + source + ',\n'); continue; }
+        const st = structural(out, true);
+        let f, i = 0;
+        while ((f = entryAt(out, list, i, st)) && f.text !== was) i++;
+        if (!f) throw cannot();
+        out = out.slice(0, f.start) + source + out.slice(f.end);
+      }
+      return out;
+    }, `Accept #${pr.number}: ${String(pr.title || '').replace(/^Submission: /, '').slice(0, 120)}`);
+    if (r.commit) commits.push(r.commit);
+  }
+  await gh(env, 'POST', `/repos/${repo}/issues/${pr.number}/comments`, { body: `Accepted on the site by ${gitText(mod.name)}. GitHub could not merge this pull request by itself, so the site published its entries directly${commits.length ? `: ${commits.join(', ')}` : ''}.` });
+  await gh(env, 'PATCH', `/repos/${repo}/pulls/${pr.number}`, { state: 'closed' });
+  return commits;
+}
 function prSummary(pr, env) {
   const own = pr.head && pr.head.repo && pr.head.repo.full_name.toLowerCase() === (env.GITHUB_REPO || '').toLowerCase();
   return { number: pr.number, title: String(pr.title || '').slice(0, 300), url: pr.html_url, author: pr.user ? pr.user.login : '', created: pr.created_at, updated: pr.updated_at,
@@ -604,7 +691,7 @@ async function publish(env, mod, path, transform, message) {
     const file = await readFile(env, path, base);
     const text = transform(file.text);
     const msg = typeof message === 'function' ? message() : message;
-    const full = `${msg}\n\nMade on the site by ${gitText(mod.name)}.`;
+    const full = `${gitText(msg)}\n\nMade on the site by ${gitText(mod.name)}.`;
     if (editMode(env) !== 'pull-request') {
       try {
         const r = await writeFile(env, path, file.sha, text, full, base, author);
@@ -635,7 +722,7 @@ async function publish(env, mod, path, transform, message) {
 /* Locating entries. A list's entries are the object literals that are its direct elements, in order, so their indices are
    those of the array in the browser; markers and text inside strings are invisible to the search (see structural). */
 function listSpan(st, name) {
-  const m = new RegExp(`(^|\\n)const ${name} = \\[`).exec(st);
+  const m = new RegExp(`(^|\\n)const\\s+${name}\\s*=\\s*\\[`).exec(st);
   if (!m) return null;
   const open = m.index + m[0].length - 1, close = matching(st, open);
   return close < 0 ? null : { open, close };
@@ -655,8 +742,8 @@ export function entrySpans(st, name) {
   return out;
 }
 /* the entry at `index`: its span and text in the original, the indentation of its opening brace, and the blanked copy */
-export function entryAt(src, name, index) {
-  const st = structural(src, true), spans = entrySpans(st, name), span = spans && spans[index];
+export function entryAt(src, name, index, st = structural(src, true)) {
+  const spans = entrySpans(st, name), span = spans && spans[index];
   if (!span) return null;
   const lineStart = src.lastIndexOf('\n', span.start) + 1;
   const indent = /^[ \t]*$/.test(src.slice(lineStart, span.start)) ? src.slice(lineStart, span.start) : '';
@@ -695,7 +782,12 @@ export function validateEntry(v, list, adding = false) {
       const keys = Object.keys(x);
       if (keys.length > 60) throw fail('The entry has too many fields.');
       const o = {};
-      for (const k of keys) { if (!IDENT.test(k) || k === '__proto__' || k === 'constructor' || k === 'prototype') throw fail(`“${k}” is not a valid field name.`); o[k] = walk(x[k], depth + 1); }
+      for (const k of keys) {
+        if (!IDENT.test(k) || k === '__proto__' || k === 'constructor' || k === 'prototype') throw fail(`“${k}” is not a valid field name.`);
+        const y = o[k] = walk(x[k], depth + 1);
+        if (k === 'url' && y && !/^https?:\/\/\S+$/i.test(String(y))) throw fail('A link must start with http:// or https://.');
+        if (k === 'date' && y && !/^\d{4}-\d{2}-\d{2}$/.test(String(y))) throw fail('A date is written as YYYY-MM-DD.');
+      }
       return o;
     }
     throw fail('Malformed entry.');

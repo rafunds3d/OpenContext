@@ -21,9 +21,9 @@ async function modApi(path, body) {
    is shown, and how it is rendered for the preview */
 const EDIT_LISTS = {
   PROBLEMS: { what: 'problem', file: 'data/problems.js', data: () => PROBLEMS, url: e => `#/problem/${e.number}`, render: e => problemArticle(e),
-    template: () => ({ number: 0, title: '', status: 'open', goals: [], topics: [], posedBy: [], curatedBy: [], ai: '', statement: '', notice: '', background: '', relevance: '', significance: '', history: [], references: [] }) },
+    template: isNew => ({ number: 0, title: '', status: 'open', goals: [], topics: [], posedBy: [], curatedBy: [], ai: '', statement: '', notice: '', background: '', relevance: '', significance: '', history: isNew ? [{ date: todayIso(), kind: 'posed', text: 'Problem posed.', by: [] }] : [], references: [] }) },
   CONTRIBUTIONS: { what: 'contribution', file: 'data/contributions.js', data: () => CONTRIBUTIONS, url: e => `#/problem/${e.problem}`, render: e => contribRows([e]),
-    template: () => ({ problem: 0, date: todayIso(), kind: '', title: '', material: '', ai: '', by: [], provisional: false, summary: '', url: '' }) },
+    template: () => ({ problem: PROBLEMS.length ? Math.min(...PROBLEMS.map(p => p.number)) : 0, date: todayIso(), kind: '', title: '', material: '', ai: '', by: [], provisional: false, summary: '', url: '' }) },
   POSTS: { what: 'post', file: 'data/posts.js', data: () => POSTS, url: e => `#/blog/${e.slug}`, render: e => postArticle(e),
     template: () => ({ slug: '', title: '', date: todayIso(), by: [], ai: '', challengeTo: '', problems: [], summary: '', body: '' }) },
   FUTURE_GOALS: { what: 'direction', file: 'data/goals.js', data: () => FUTURE_GOALS, url: () => '#/future-goals', render: e => directionSection(e),
@@ -35,7 +35,7 @@ const ROW_TEMPLATES = { history: () => ({ date: todayIso(), kind: 'note', to: ''
 const HISTORY_KINDS = ['posed', 'status', 'advance', 'interest', 'note'];
 const STATUS_TEXT = { 'under-revision': 'A solution has been claimed; the problem is placed under revision.', solved: 'The problem is marked solved.', open: 'The problem is reopened.' };
 const LONG_FIELDS = { statement: 6, background: 8, relevance: 5, significance: 5, notice: 3, summary: 4, body: 14, description: 10, text: 2 };
-const FIELD_LABELS = { title: 'Title', topics: 'Topics', posedBy: 'Posed by', curatedBy: 'Curated by', by: 'By', statement: 'Statement', notice: 'Notice (shown as a callout above the entry)', background: 'Background', relevance: 'Relevance', significance: 'Significance', history: 'History', references: 'References', material: 'Type of material', summary: 'Summary', url: 'Link', provisional: 'Provisional: incomplete, unpolished, or only partially verified', slug: 'Address (the part after #/blog/)', body: 'Text', description: 'Description', proposedBy: 'Proposed by', numeral: 'Numeral', id: 'Id', text: 'Text', date: 'Date (YYYY-MM-DD)', problems: 'Problems it is about' };
+const FIELD_LABELS = { title: 'Title', topics: 'Topics', posedBy: 'Posed by', curatedBy: 'Curated by', by: 'By', statement: 'Statement', notice: 'Notice (shown as a callout under the statement)', background: 'Background', relevance: 'Relevance', significance: 'Significance', history: 'History', references: 'References', material: 'Type of material', summary: 'Summary', url: 'Link', provisional: 'Provisional: incomplete, unpolished, or only partially verified', slug: 'Address (the part after #/blog/)', body: 'Text', description: 'Description', proposedBy: 'Proposed by', numeral: 'Numeral', id: 'Id', text: 'Text', date: 'Date (YYYY-MM-DD)', problems: 'Problems it is about' };
 const MATH_HELP = 'Inline math between <code>\\(</code> and <code>\\)</code>, display math between <code>\\[</code> and <code>\\]</code>; a blank line starts a new paragraph. The tags em, strong, a, code, sup, sub and br work too.';
 
 /* ---- the Moderate page: sign-in, the queue of submissions, the lists of entries ---- */
@@ -51,7 +51,7 @@ function viewModerate(params) {
     <p id="mod-msg" class="callout err" hidden></p></div>`;
   const s = modSession();
   if (!s) return `${head}<div class="prose">
-    <p>Moderators sign in with a link sent to their address; you then stay signed in on this browser for 30 days. Once signed in, every problem, contribution, post, goal and direction shows an <span class="edit-link" aria-hidden="true">Edit</span> button next to it, and submissions can be accepted or declined here.</p>
+    <p>Moderators sign in with a link sent to their address; you then stay signed in on this browser for 30 days. Once signed in, every problem, contribution, post, goal and direction shows an <span class="edit-link">Edit</span> button next to it, and submissions can be accepted or declined here.</p>
     </div>
     <form id="login-form" class="form" novalidate>
       <div class="field"><label for="login-email">Your e-mail address</label><input id="login-email" name="email" type="email" placeholder="you@your-institution.edu" autocomplete="email"></div>
@@ -71,7 +71,7 @@ function viewModerate(params) {
   <h2 class="sec-title">Submissions awaiting a decision</h2>
   <div id="queue"><p class="muted" style="text-align:center">Loading the open pull requests…</p></div>
   <h2 class="sec-title">Edit an entry</h2>
-  <div class="prose"><p>Open any entry on the site and press <span class="edit-link" aria-hidden="true">Edit</span> next to it, or pick it here. A save is published at once as a commit in your name${s.mode === 'pull-request' ? ', unless the service is set to open pull requests instead' : ''}; the public site redeploys within a minute or two, and this browser shows the change immediately.</p></div>
+  <div class="prose"><p>Open any entry on the site and press <span class="edit-link">Edit</span> next to it, or pick it here. ${s.mode === 'pull-request' ? 'A save opens a pull request for review, and appears on the site once it is merged.' : 'A save is published at once as a commit in your name; the public site redeploys within a minute or two, and this browser shows the change immediately.'}</p></div>
   ${block('Problems', problems, ['Add a problem', '#/edit?list=PROBLEMS&new=1'])}
   ${block('Contributions', contribs, ['Add a contribution', '#/edit?list=CONTRIBUTIONS&new=1'])}
   ${block('Blog posts', posts, ['Add a post', '#/edit?list=POSTS&new=1'])}
@@ -95,14 +95,19 @@ function viewEdit(params) {
 let editRowSeq = 0;
 /* the form: the entry's own fields first, in their order, then the standard fields it lacks (dropped again when left empty) */
 function editForm(list, entry, isNew) {
-  const spec = EDIT_LISTS[list], template = spec.template();
-  const keys = [...Object.keys(entry), ...Object.keys(template).filter(k => !(k in entry))];
+  const spec = EDIT_LISTS[list], template = spec.template(isNew);
+  const keys = [...Object.keys(template), ...Object.keys(entry).filter(k => !(k in template))];   // the standard order, then the entry's own extras
   const blank = v => v === '' || v === false || (Array.isArray(v) && !v.length);
   /* a field the entry lacks, or a blank field of a new entry, is dropped again when left empty */
-  const fields = keys.map(k => fieldControl(list, k, k in entry ? entry[k] : template[k], k, isNew ? blank(template[k]) && k !== 'status' : !(k in entry), '')).join('');
+  let helped = false;
+  const fields = keys.map(k => {
+    let h = fieldControl(list, k, k in entry ? entry[k] : template[k], k, isNew ? blank(template[k]) && k !== 'status' : !(k in entry), '');
+    if (h.includes(MATH_HELP)) { if (helped) h = h.replace(MATH_HELP, 'Math and tags as in the first text field.'); helped = true; }   // the full note once
+    return h;
+  }).join('');
   return `<form id="edit-form" class="form" novalidate>
     ${fields}
-    <p id="edit-msg" class="callout err" hidden></p>
+    <p id="edit-msg" class="callout err" role="status" tabindex="-1" hidden></p>
     <p class="form-actions"><button class="btn" type="submit">${isNew ? 'Publish' : 'Save'}</button> <button class="btn btn-quiet" type="button" data-preview>Preview</button>${!isNew && !spec.fixed ? ` <button class="btn btn-quiet" type="button" data-remove>Remove this ${spec.what}</button>` : ''} <span class="small muted" data-mode-note></span></p>
   </form>
   <div id="edit-preview" class="preview" hidden></div>`;
@@ -116,6 +121,8 @@ function fieldControl(list, key, value, path, optional, ctx) {
   const area = (cur, rows) => `<textarea id="${id}" name="${path}" rows="${rows}"${opt}>${esc(cur ?? '')}</textarea>`;
   const wide = ctx ? ' wide' : '';
   if (key === 'number' && list === 'PROBLEMS' && !ctx) return `<div class="field"><span class="label">Number</span><p class="muted small" style="margin:0">${value ? value : 'assigned when the problem is published'}</p><input type="hidden" name="${path}" value="${Number(value) || 0}" data-type="number"></div>`;
+  if (key === 'id' && list === 'GOALS' && !ctx) return `<div class="field"><span class="label">Id</span><p class="muted small" style="margin:0">${esc(value)} <span class="muted">(fixed; the agenda links use it)</span></p><input type="hidden" name="${path}" value="${esc(value)}"></div>`;
+  if (key === 'slug' && list === 'POSTS' && !ctx) return wrap(label, input(value, '', 'derived from the title when left empty'), 'Lowercase letters, digits and hyphens; leave empty to derive it from the title.');
   if (key === 'status' && !ctx) return wrap('Status', sel(Object.entries(STATUSES).map(([k, v]) => [k, v.label]), value), 'A change of status is recorded in the history below, dated today; edit the wording there if needed.');
   if (key === 'goals' && Array.isArray(value)) return `<div class="field"><span class="label">Goals it traces to</span><div class="checks">${GOALS.map(g => `<label><input type="checkbox" name="${path}" value="${g.id}" data-type="multi"${opt}${value.includes(g.id) ? ' checked' : ''}> ${g.numeral}. ${esc(g.title)}</label>`).join('')}</div></div>`;
   if (key === 'kind') return wrap('Kind', sel([['', 'Choose…'], ...(ctx === 'history' ? HISTORY_KINDS.map(k => [k, k]) : Object.entries(CONTRIBUTION_KINDS).map(([k, v]) => [k, v.label]))], value));
@@ -128,7 +135,10 @@ function fieldControl(list, key, value, path, optional, ctx) {
   if (Array.isArray(value)) {
     if (ROW_TEMPLATES[key] || value.some(x => x && typeof x === 'object')) return groupControl(list, key, value, path, optional);
     if (key === 'problems') return wrap(label, input(value.join(', '), 'numbers', 'e.g. 1, 3'), 'Problem numbers, comma-separated.');
-    return wrap(label, input(value.join(', '), 'list'), ctx ? '' : 'Comma-separated; commas inside brackets do not separate.');
+    if (value.some(x => typeof x !== 'string')) return wrap(label, area(JSON.stringify(value, null, 2), 6).replace('<textarea ', '<textarea data-type="json" '), 'JSON');
+    const joined = value.join(', ');
+    if (JSON.stringify(splitNames(joined)) !== JSON.stringify(value)) return wrap(label, area(value.join('\n'), Math.min(8, value.length + 1)).replace('<textarea ', '<textarea data-type="lines" '), ctx ? '' : 'One per line (these names contain commas).');   // names such as “Smith, Jr.” cannot be comma-separated
+    return wrap(label, input(joined, 'list'), ctx ? '' : 'Comma-separated; commas inside brackets do not separate.');
   }
   if (value && typeof value === 'object') return wrap(label, area(JSON.stringify(value, null, 2), 6).replace('<textarea ', '<textarea data-type="json" '), 'JSON');
   if (key === 'date') return wrap(label, input(value, '', 'YYYY-MM-DD'), '', wide ? '' : '');
@@ -161,9 +171,13 @@ function readForm(form) {
     if (type === 'boolean') v = el.checked;
     else if (type === 'number') { if (el.value.trim() === '') { if (!opt) set(path, 0); continue; } v = Number(el.value); if (!Number.isFinite(v)) throw new Error(`“${path}” must be a number.`); }
     else if (type === 'list') v = splitNames(el.value);
+    else if (type === 'lines') v = el.value.split('\n').map(s => s.trim()).filter(Boolean);
     else if (type === 'numbers') v = el.value.split(/[,\s]+/).map(Number).filter(n => Number.isInteger(n) && n > 0);
     else if (type === 'json') { try { v = JSON.parse(el.value); } catch (e) { throw new Error(`The field “${path}” is not valid JSON.`); } }
     else v = el.value.replace(/\r\n?/g, '\n').trim();
+    const key = path.split('.').pop();
+    if (key === 'date' && v && !/^\d{4}-\d{2}-\d{2}$/.test(v)) { el.focus(); throw new Error(`The date “${v}” must be written as YYYY-MM-DD.`); }
+    if (key === 'url' && v && !/^https?:\/\/\S+$/i.test(v)) { el.focus(); throw new Error(`The link “${v}” must start with http:// or https:// and contain no spaces.`); }
     const empty = v === '' || v === false || (Array.isArray(v) && !v.length);
     if (opt && empty) continue;
     set(path, v);
@@ -206,7 +220,7 @@ function parseEntrySource(src) {
     }
     if (c === '`' || src.startsWith('tex`', i)) {
       const q = src.indexOf('`', i); let j = q + 1;
-      while (j < n && src[j] !== '`') { if (src[j] === '\\' && src[j + 1] === '`') j++; j++; }
+      while (j < n && src[j] !== '`') { if (src[j] === '\\') j++; j++; }
       if (j >= n) err('an unterminated text');
       const raw = src.slice(q + 1, j); i = j + 1;
       if (raw.includes('${')) err('a template expression');
@@ -229,10 +243,13 @@ async function initEditPage() {
   if (!root || root.dataset.ready) return;
   root.dataset.ready = '1';
   const list = root.dataset.list, spec = EDIT_LISTS[list], isNew = root.dataset.new === '1', index = Number(root.dataset.index);
-  let entry = spec.template(), original = null;
+  let entry = spec.template(isNew), original = null, at = index;   // `index` in the lists this browser loaded, `at` in the repository
   if (!isNew) {
     try {
-      const r = await modApi(`/entry?list=${list}&index=${index}`);
+      const local = spec.data()[index];
+      const key = local ? (list === 'PROBLEMS' ? { number: local.number } : list === 'POSTS' ? { slug: local.slug } : list === 'GOALS' ? { id: local.id } : list === 'CONTRIBUTIONS' ? { problem: local.problem, date: local.date, title: local.title } : { title: local.title }) : null;
+      const r = await modApi(`/entry?list=${list}&index=${index}${key ? `&key=${encodeURIComponent(JSON.stringify(key))}` : ''}`);
+      if (Number.isInteger(r.index)) at = r.index;
       root._was = r.source;
       original = parseEntrySource(r.source);
       if (!original || typeof original !== 'object' || Array.isArray(original)) throw new Error('not an entry');
@@ -240,16 +257,18 @@ async function initEditPage() {
     } catch (e) {
       const local = spec.data()[index];
       const gh = SITE.repo ? ` <a href="${esc(SITE.repo)}/edit/main/${spec.file}" rel="noopener">Edit it on GitHub</a> instead.` : '';
+      if (!root.isConnected) return;
       root.innerHTML = `<p class="callout err">${esc(e.message)}${root._was ? ` This entry could not be read as data, which happens when it was written with unusual formatting.${gh}` : ''}</p>${local ? `<div class="preview">${spec.render(local)}</div>` : ''}`;
       typeset(root);
       return;
     }
   }
+  if (!root.isConnected) return;   // the moderator moved on while the entry loaded
   root.innerHTML = editForm(list, entry, isNew);
   const s = modSession(), note = root.querySelector('[data-mode-note]');
   if (note) note.textContent = s && s.mode === 'pull-request' ? 'Saving opens a pull request for review.' : 'Saving publishes the change at once, as a commit in your name.';
-  const form = $('#edit-form'), msg = $('#edit-msg'), preview = $('#edit-preview');
-  const say = (t, ok) => { msg.innerHTML = t; msg.className = 'callout' + (ok ? ' ok' : ' err'); msg.hidden = false; msg.scrollIntoView({ block: 'nearest' }); };
+  const form = root.querySelector('#edit-form'), msg = root.querySelector('#edit-msg'), preview = root.querySelector('#edit-preview');
+  const say = (t, ok) => { msg.innerHTML = t; msg.className = 'callout' + (ok ? ' ok' : ' err'); msg.hidden = false; msg.scrollIntoView({ block: 'nearest' }); if (ok) msg.focus({ preventScroll: true }); };
   /* a change of status gets its dated history entry, kept in step with the select until the moderator edits it */
   const status = form.querySelector('[name="status"]');
   if (status && original && list === 'PROBLEMS') status.addEventListener('change', () => {
@@ -267,7 +286,7 @@ async function initEditPage() {
     const del = e.target.closest('[data-del-row]');
     if (del) { del.closest('[data-row]').remove(); return; }
     if (e.target.closest('[data-preview]')) {
-      try { preview.innerHTML = `<p class="small muted" style="margin:0 0 .4rem">Preview</p>${spec.render(readForm(form))}`; preview.hidden = false; typeset(preview); preview.scrollIntoView({ block: 'nearest' }); }
+      try { const v = readForm(form); if (isNew && list === 'PROBLEMS') v.number = Math.max(0, ...PROBLEMS.map(p => p.number)) + 1; preview.innerHTML = `<p class="small muted" style="margin:0 0 .4rem">Preview</p>${spec.render(v)}`; preview.hidden = false; typeset(preview); preview.scrollIntoView({ block: 'nearest' }); }
       catch (err) { say(esc(err.message)); }
       return;
     }
@@ -285,25 +304,32 @@ async function initEditPage() {
     if (!remove && list === 'CONTRIBUTIONS' && !next.kind) return say('Choose the kind of contribution.');
     if (isNew && list === 'PROBLEMS') delete next.number;
     for (const b of form.querySelectorAll('button')) b.disabled = true;
+    let done = false, pr = false;
     try {
-      const r = remove ? await modApi('/remove', { list, index, was: root._was })
+      const r = remove ? await modApi('/remove', { list, index: at, was: root._was })
         : isNew ? await modApi('/add', { list, entry: next })
-        : await modApi('/edit', { list, index, was: root._was, entry: next });
-      const saved = r.entry || next;
+        : await modApi('/edit', { list, index: at, was: root._was, entry: next });
+      done = true;
+      const saved = r.entry || next; pr = r.mode === 'pull-request';
       if (r.mode !== 'pull-request') {   // this browser shows the change at once; the public site follows when GitHub Pages redeploys
         const data = spec.data();
         if (remove) data.splice(index, 1);
         else if (isNew) data.push(saved);
         else { const o = data[index]; if (o) { for (const k of Object.keys(o)) delete o[k]; Object.assign(o, saved); } }
       }
-      const where = r.mode === 'pull-request' ? `opened <a href="${esc(r.pr)}" rel="noopener">a pull request</a>; it appears on the site once merged` : `published${r.commit ? ` (<a href="${esc(r.commit)}" rel="noopener">the commit</a>)` : ''}; the public site redeploys within a minute or two`;
-      say(`${remove ? 'Removed' : isNew ? 'Added' : 'Saved'} and ${where}. ${remove ? `<a href="#/moderate">Back to moderation</a>.` : `<a href="${esc(spec.url(saved))}">View the ${spec.what}</a>${isNew ? '' : ', or keep editing below'}.`}`, true);
+      const where = pr ? `opened <a href="${esc(r.pr)}" rel="noopener">a pull request</a>; it appears on the site once merged` : `published${r.commit ? ` (<a href="${esc(r.commit)}" rel="noopener">the commit</a>)` : ''}; the public site redeploys within a minute or two`;
+      const then = remove ? `<a href="#/moderate">Back to moderation</a>.` : pr ? `Reload this page to make another change${isNew ? '' : ', or <a href="#/moderate">go back to moderation</a>'}.` : `<a href="${esc(spec.url(saved))}">View the ${spec.what}</a>${isNew ? '' : ', or keep editing below'}.`;
+      say(`${remove ? 'Removed' : isNew ? 'Added' : 'Saved'} and ${where}. ${then}`, true);
       if (remove) form.hidden = true;
-      else if (isNew) { for (const el of form.querySelectorAll('input,select,textarea')) el.disabled = true; }   // a new entry is edited from its own page
-      else if (r.mode !== 'pull-request') root._was = r.source || null;   // the file now holds this text; in pull-request mode the base branch is unchanged
+      else if (isNew || pr) { for (const el of form.querySelectorAll('input,select,textarea')) el.disabled = true; }   // a new entry is edited from its own page; a pull request, on GitHub
+      else {
+        root._was = r.source || null;   // the file now holds this text, and this is now the entry the form started from
+        original = saved;
+        for (const el of form.querySelectorAll('[data-row][data-auto]')) el.removeAttribute('data-auto');   // the history row is published; a further change gets its own
+      }
     } catch (err) { say(esc(err.message)); }
     for (const b of form.querySelectorAll('button')) b.disabled = false;
-    if (isNew) form.querySelector('button[type=submit]').disabled = true;
+    if (done && (isNew || pr)) form.querySelector('button[type=submit]').disabled = true;   // a new entry is edited from its own page; a pull request, on GitHub
   }
 }
 async function initModeratePage() {
@@ -337,16 +363,19 @@ async function loadQueue(queue) {
       <div class="pull-detail" hidden></div>
       <p class="pull-actions"><button class="btn btn-quiet btn-small" type="button" data-show="${p.number}">Show the changes</button> <button class="btn btn-small" type="button" data-accept="${p.number}">Accept</button> <button class="btn btn-quiet btn-small" type="button" data-decline="${p.number}">Decline…</button></p>
       <div class="decline-box" hidden><div class="field"><label for="reason-${p.number}">A note for the submitter (optional, posted on the pull request)</label><textarea id="reason-${p.number}" rows="3"></textarea></div><p class="form-actions"><button class="btn btn-small" type="button" data-decline-confirm="${p.number}">Decline and close</button> <button class="linklike small" type="button" data-decline-cancel="${p.number}">Cancel</button></p></div>
-      <p class="callout err small" data-pull-msg hidden></p>
+      <p class="callout err small" data-pull-msg role="status" tabindex="-1" hidden></p>
     </li>`).join('')}</ul>`;
     if (!queue.dataset.wired) { queue.dataset.wired = '1'; queue.addEventListener('click', onQueueClick); }
-  } catch (err) { queue.innerHTML = `<p class="callout err">${esc(err.message)}</p>`; }
+  } catch (err) {
+    if (!modSession() && location.hash.startsWith('#/moderate')) return route();   // the session ended (signed out elsewhere, or removed from the list): back to the sign-in
+    queue.innerHTML = `<p class="callout err">${esc(err.message)}</p>`;
+  }
 }
 async function onQueueClick(e) {
   const b = e.target.closest('button[data-show],button[data-accept],button[data-decline],button[data-decline-confirm],button[data-decline-cancel]');
   if (!b) return;
   const li = b.closest('.pull'), n = Number(li.dataset.number), msg = li.querySelector('[data-pull-msg]');
-  const say = (t, ok) => { msg.innerHTML = t; msg.className = 'callout small' + (ok ? ' ok' : ' err'); msg.hidden = false; };
+  const say = (t, ok) => { msg.innerHTML = t; msg.className = 'callout small' + (ok ? ' ok' : ' err'); msg.hidden = false; if (ok) msg.focus({ preventScroll: true }); };
   if (b.dataset.decline) { li.querySelector('.decline-box').hidden = false; li.querySelector('textarea').focus(); return; }
   if (b.dataset.declineCancel) { li.querySelector('.decline-box').hidden = true; return; }
   if (b.dataset.show) {
@@ -364,7 +393,7 @@ async function onQueueClick(e) {
   if (b.dataset.accept) {
     if (b.dataset.armed !== '1') { b.dataset.armed = '1'; b.textContent = 'Yes, accept and publish'; setTimeout(() => { b.dataset.armed = ''; b.textContent = 'Accept'; }, 6000); return; }
     for (const x of li.querySelectorAll('button')) x.disabled = true;
-    try { const r = await modApi('/accept', { number: n }); say(`Accepted and merged; the site redeploys within a minute or two (<a href="${esc(r.url)}" rel="noopener">the pull request</a>).`, true); li.querySelector('.pull-actions').remove(); }
+    try { const r = await modApi('/accept', { number: n }); say(`${r.applied ? 'Accepted; GitHub could not merge it by itself, so the site published its entries directly' : 'Accepted and merged'}; the site redeploys within a minute or two (<a href="${esc(r.url)}" rel="noopener">the pull request</a>).`, true); li.querySelector('.pull-actions').remove(); }
     catch (err) { say(esc(err.message)); for (const x of li.querySelectorAll('button')) x.disabled = false; b.dataset.armed = ''; b.textContent = 'Accept'; }
     return;
   }
@@ -374,21 +403,34 @@ async function onQueueClick(e) {
     catch (err) { say(esc(err.message)); for (const x of li.querySelectorAll('button')) x.disabled = false; }
   }
 }
-/* a submission's entry, rendered as it will appear once merged: the added lines of a data file, read as data (never run) */
+/* The entries a pull request adds or changes, rendered as they will appear once merged: the service sends them as text
+   (read here as data, never run); without that, the added lines of the diff serve, when they hold a whole entry. */
 function previewOfPatch(f) {
-  const list = Object.keys(EDIT_LISTS).find(k => EDIT_LISTS[k].file === f.path && k !== 'GOALS');
-  if (!list || !f.patch) return '';
-  const added = f.patch.split('\n').filter(l => l.startsWith('+') && !l.startsWith('+++')).map(l => l.slice(1)).join('\n');
-  const at = added.indexOf('{');
-  if (at < 0) return '';
-  try {
-    /* a pull request can come from anyone on GitHub, so its text is treated like a submission: tags beyond the allowed
-       few are shown literally, both in this preview and, if accepted as it is, on the site */
-    const guard = x => typeof x === 'string' ? sanitizeMarkup(x) : Array.isArray(x) ? x.map(guard) : x && typeof x === 'object' ? Object.fromEntries(Object.entries(x).map(([k, v]) => [k, guard(v)])) : x;
-    const e = guard(parseEntrySource(added.slice(at)));
-    if (!e || typeof e !== 'object' || !e.title) return '';
-    return `<div class="preview">${EDIT_LISTS[list].render(e)}</div>`;
-  } catch (err) { return ''; }
+  const lists = Object.keys(EDIT_LISTS).filter(k => EDIT_LISTS[k].file === f.path);
+  if (!lists.length) return '';
+  let items = Array.isArray(f.entries) ? f.entries.filter(e => e && EDIT_LISTS[e.list] && typeof e.source === 'string').map(e => [e.list, e.source]) : [];
+  if (!items.length && f.patch) {
+    const added = f.patch.split('\n').filter(l => l.startsWith('+') && !l.startsWith('+++')).map(l => l.slice(1)).join('\n');
+    const at = added.indexOf('{');
+    if (at >= 0) items = [[lists.find(k => k !== 'GOALS') || lists[0], added.slice(at)]];
+  }
+  /* a pull request can come from anyone on GitHub, so its text is treated like a submission: tags beyond the allowed
+     few are shown literally, both in this preview and, if accepted as it is, on the site */
+  const ID_KEYS = ['status', 'kind', 'to', 'ai', 'challengeTo', 'id', 'goals', 'slug'];   // used in class names and addresses
+    const guard = (x, k) => {
+      if (k === 'number' || k === 'problem') return Number.isInteger(x) && x > 0 ? x : 0;
+      if (k === 'problems') return Array.isArray(x) ? x.filter(y => Number.isInteger(y) && y > 0) : [];
+      if (typeof x === 'string') return k === 'url' ? webUrl(x) : ID_KEYS.includes(k) ? x.replace(/[^A-Za-z0-9-]/g, '') : sanitizeMarkup(x);
+      if (Array.isArray(x)) return x.map(y => guard(y, k));
+      if (x && typeof x === 'object') return Object.fromEntries(Object.entries(x).map(([kk, v]) => [kk, guard(v, kk)]));
+      return x;
+    };
+  const out = [];
+  for (const [list, src] of items) {
+    try { const e = guard(parseEntrySource(src), ''); if (e && typeof e === 'object' && e.title) out.push(`<div class="preview">${EDIT_LISTS[list].render(e)}</div>`); }
+    catch (err) { /* not a whole entry: the diff below is all there is to see */ }
+  }
+  return out.join('');
 }
 /* On every page: the Moderate link in the header and an Edit button on each entry, for a signed-in moderator only. */
 function initModeration() {
@@ -403,7 +445,7 @@ function initModeration() {
     const [list, index] = el.dataset.edit.split(':');
     if (!EDIT_LISTS[list] || !(Number(index) >= 0)) continue;
     const a = document.createElement('a');
-    a.className = 'edit-link'; a.href = `#/edit?list=${list}&index=${index}`; a.textContent = 'Edit'; a.title = `Edit this ${EDIT_LISTS[list].what} (moderators)`;
+    a.className = 'edit-link'; a.href = `#/edit?list=${list}&index=${index}`; a.textContent = 'Edit'; a.title = `Edit this ${EDIT_LISTS[list].what} (moderators)`; a.setAttribute('aria-label', `Edit this ${EDIT_LISTS[list].what}`);
     const slot = el.querySelector('[data-edit-slot]') || el;
     if (slot === el) el.prepend(a); else slot.append(' ', a);
   }

@@ -9,10 +9,10 @@ function viewProblem(num) {
 }
 /* the entry itself; data-edit lets a signed-in moderator edit it in place (see pages/moderate.js) */
 function problemArticle(p) {
-  const refs = (p.references || []).map(r => `<li>${r.url ? `<a href="${esc(r.url)}" rel="noopener">${esc(r.text)}</a>` : esc(r.text)}</li>`).join('');
+  const refs = (p.references || []).map(r => `<li>${webUrl(r.url) ? `<a href="${esc(r.url)}" rel="noopener">${esc(r.text)}</a>` : esc(r.text)}</li>`).join('');
   const hist = (p.history || []).slice().sort((a, b) => (b.date || '').localeCompare(a.date || '')).map(h => `<li>
     <span class="hist-date">${fmtDate(h.date, true)}</span>
-    <span><span class="hist-kind">${esc(h.kind)}</span>${h.url ? `<a href="${esc(h.url)}" rel="noopener">${h.text}</a>` : h.text}${(h.by || []).length ? ` <span class="hist-by">(${names(h.by)})</span>` : ''}</span>
+    <span><span class="hist-kind">${esc(h.kind)}</span>${webUrl(h.url) ? `<a href="${esc(h.url)}" rel="noopener">${h.text}</a>` : h.text}${(h.by || []).length ? ` <span class="hist-by">(${names(h.by)})</span>` : ''}</span>
   </li>`).join('');
   const contribs = contributionsFor(p);
   const posts = postsForProblem(p);
@@ -43,7 +43,7 @@ function problemArticle(p) {
     ${contribs.length ? contribRows(contribs) : `<p class="muted">No contributions recorded yet.</p>`}
     ${posts.length ? `<p class="small" style="margin-top:.8rem">Blog posts about this problem: ${posts.map(x => `<a href="#/blog/${esc(x.slug)}">${esc(x.title)}</a>`).join(', ')}.</p>` : ''}
     <p class="small muted" style="margin-top:.8rem">Attempted solutions, partial or negative results, reformulations, computational evidence, verifications, expositions, and questions about the statement are welcome here, provisional or not. Each is recorded with its title, the type of material, the extent of AI use, and the names of the people responsible for it. See <a href="#/contribute?to=advance">how to contribute</a>.</p>
-    <p style="text-align:center"><a class="btn btn-small" href="#/submit?type=contribution&amp;problem=${p.number}">Submit a contribution to this problem</a></p>
+    <p style="text-align:center"><a class="btn btn-small" href="#/submit?type=contribution&amp;problem=${esc(p.number)}">Submit a contribution to this problem</a></p>
     ${refs ? `<h2 class="sec-title">${letter()} References</h2><ol class="refs">${refs}</ol>` : ''}
     <h2 class="sec-title">${letter()} Attribution and citation</h2>
     <dl class="people">

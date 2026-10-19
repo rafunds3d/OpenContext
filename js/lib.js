@@ -111,7 +111,7 @@ function contribRows(list) {
   const all = typeof CONTRIBUTIONS !== 'undefined' ? CONTRIBUTIONS : [];
   return `<ul class="hist contribs">${list.map(c => `<li data-edit="CONTRIBUTIONS:${all.indexOf(c)}">
     <span class="hist-date">${fmtDate(c.date, true)}</span>
-    <span><span class="hist-kind">${esc(contributionKind(c.kind))}</span>${c.url ? `<a href="${esc(c.url)}" rel="noopener">${esc(c.title)}</a>` : `<strong>${esc(c.title)}</strong>`}${c.provisional ? ' <span class="flag">provisional</span>' : ''}
+    <span><span class="hist-kind">${esc(contributionKind(c.kind))}</span>${webUrl(c.url) ? `<a href="${esc(c.url)}" rel="noopener">${esc(c.title)}</a>` : `<strong>${esc(c.title)}</strong>`}${c.provisional ? ' <span class="flag">provisional</span>' : ''}
       ${c.summary ? `<div class="contrib-sum">${paras(c.summary)}</div>` : ''}
       <p class="contrib-meta" data-edit-slot>${c.material ? esc(c.material) + ' · ' : ''}${esc(aiUseLabel(c.ai) || 'AI use not stated')}${(c.by || []).length ? ` · <span class="hist-by">${names(c.by)}</span>` : ''}</p></span>
   </li>`).join('')}</ul>`;

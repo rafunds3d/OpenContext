@@ -4,7 +4,7 @@
 function viewBlog() {
   const items = postsAll().map(x => `<li class="row" style="grid-template-columns:minmax(0,1fr)">
     <span class="row-title"><a href="#/blog/${esc(x.slug)}">${esc(x.title)}</a>${x.challengeTo ? ' <span class="st st-under-revision">challenge</span>' : ''}</span>
-    <p class="row-meta"><span>${fmtDate(x.date, true)}</span>${(x.by || []).length ? `<span>by ${names(x.by)}</span>` : ''}${(x.problems || []).length ? `<span>${x.problems.map(n => `<a href="#/problem/${n}">Problem ${n}</a>`).join(', ')}</span>` : ''}</p>
+    <p class="row-meta"><span>${fmtDate(x.date, true)}</span>${(x.by || []).length ? `<span>by ${names(x.by)}</span>` : ''}${(x.problems || []).length ? `<span>${x.problems.map(n => `<a href="#/problem/${esc(n)}">Problem ${esc(n)}</a>`).join(', ')}</span>` : ''}</p>
     ${x.summary ? `<p class="row-q">${esc(x.summary)}</p>` : ''}
   </li>`).join('');
   return `<h1 class="page-title">Blog</h1>
@@ -29,6 +29,6 @@ function postArticle(x) {
     ${g ? `<p class="notice">A challenge to Goal ${g.numeral}, <a href="#/agenda?to=${g.id}">${esc(g.title)}</a>. Challenges state the objection, the assumption or motivation they contest, and what the goal would lose if the objection held. They have no solution and stay open for discussion.</p>` : ''}
     ${x.summary ? `<p><strong>${esc(x.summary)}</strong></p>` : ''}
     ${paras(x.body)}
-    ${(x.problems || []).length ? `<p class="small muted">About ${x.problems.map(n => `<a href="#/problem/${n}">Problem ${n}</a>`).join(', ')}.</p>` : ''}
+    ${(x.problems || []).length ? `<p class="small muted">About ${x.problems.map(n => `<a href="#/problem/${esc(n)}">Problem ${esc(n)}</a>`).join(', ')}.</p>` : ''}
   </article>`;
 }

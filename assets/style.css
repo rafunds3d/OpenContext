@@ -219,7 +219,7 @@ a.edit-link:hover { background: var(--ink); color: #fff; text-decoration: none; 
 .row-edit .field label { font-size: .78rem; margin-bottom: .15rem; }
 .row-edit .wide, .row-edit .row-tools { grid-column: 1 / -1; }
 .row-edit .row-tools { margin: .2rem 0 0; text-align: right; }
-.row-edit[data-auto] { background: var(--tan); }
+.row-edit[data-auto] { background: var(--tan); padding: .3rem .5rem .6rem; margin: .3rem -.5rem 0; }
 .linklike.small { font-size: .85rem; color: var(--ink-2); }
 .field .help code { font-size: .85em; }
 .preview { border: 1px dashed var(--rule-2); border-radius: 6px; padding: .6rem 1rem .8rem; margin: 1rem 0; }

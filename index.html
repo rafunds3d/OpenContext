@@ -19,7 +19,8 @@
 window.MathJax = {
   tex: {
     inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']],
-    macros: { ket: ['|#1\\rangle', 1], bra: ['\\langle #1|', 1], braket: ['\\langle #1\\rangle', 1] }
+    macros: { ket: ['|#1\\rangle', 1], bra: ['\\langle #1|', 1], braket: ['\\langle #1\\rangle', 1] },
+    autoload: { html: [] }   /* no \href, \class, \style or \cssId: text reaches the site from anyone who submits */
   },
   options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code', 'kbd', 'input', 'select', 'option'] }
 };
