@@ -12,14 +12,17 @@ part of the list, and what near-term problems would trace back to it.\`
 },`;
 }
 
-function viewFutureGoals() {
-  const list = (typeof FUTURE_GOALS !== 'undefined' ? FUTURE_GOALS : []).slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-  const items = list.map(g => `<section class="prose">
+function directionSection(g) {
+  return `<section class="prose" data-edit="FUTURE_GOALS:${FUTURE_GOALS.indexOf(g)}">
     <h2 class="sec-title">${apple('apple-goal')} ${esc(g.title)}</h2>
-    <p class="muted small" style="text-align:center;margin-top:-.4rem">Proposed ${g.date ? fmtDate(g.date) : ''}${(g.proposedBy || []).length ? ` by ${names(g.proposedBy)}` : ''}</p>
+    <p class="muted small" style="text-align:center;margin-top:-.4rem" data-edit-slot>Proposed ${g.date ? fmtDate(g.date) : ''}${(g.proposedBy || []).length ? ` by ${names(g.proposedBy)}` : ''}</p>
     ${g.summary ? `<p><strong>${esc(g.summary)}</strong></p>` : ''}
     ${paras(g.description)}
-  </section>`).join('');
+  </section>`;
+}
+function viewFutureGoals() {
+  const list = (typeof FUTURE_GOALS !== 'undefined' ? FUTURE_GOALS : []).slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  const items = list.map(directionSection).join('');
   return `<h1 class="page-title">Future broad goals</h1>
   <div class="prose">
   <p>The goals that organize the current cycle of the list, ${esc(SITE.edition || SITE.name)}, are provisional: they describe where the field's existing lines of inquiry are heading and serve to organize the problems, not to settle what is worth pursuing. Several directions may coexist, and anyone may propose another. Proposals are collected here, discussed, and considered when the next cycle's list of problems is selected and the agenda reassessed.</p>

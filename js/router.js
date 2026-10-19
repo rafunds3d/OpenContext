@@ -37,17 +37,25 @@ function route() {
   if (path === '') { html = viewHome(); nav = 'home'; }
   else if (path === 'problems') { html = viewProblems(params); title = 'Problems'; nav = 'problems'; }
   else if (path.startsWith('problem/')) {
-    const num = parseInt(path.slice('problem/'.length), 10);
+    const tail = path.slice('problem/'.length);
+    const num = /^\d+$/.test(tail) ? parseInt(tail, 10) : NaN;
     const p = PROBLEMS.find(x => x.number === num);
     html = viewProblem(num); title = p ? `Problem ${p.number}: ${plain(p.title)}` : 'Not found'; nav = 'problems';
   }
   else if (path === 'agenda') { html = viewAgenda(); title = 'Research agenda'; nav = 'agenda'; }
-      else if (path === 'future-goals') { html = viewFutureGoals(); title = 'Future broad goals'; nav = 'agenda'; }
+  else if (path === 'future-goals') { html = viewFutureGoals(); title = 'Future broad goals'; nav = 'agenda'; }
   else if (path === 'tags') { html = viewTags(); title = 'Topics'; nav = 'tags'; }
   else if (path.startsWith('tag/')) { const t = topicBySlug(path.slice(4)); html = viewTag(path.slice(4)); title = t ? t.name : 'Not found'; nav = 'tags'; }
+  else if (path === 'progress') { html = viewProgress(); title = 'Progress'; nav = 'progress'; }
+  else if (path === 'blog') { html = viewBlog(); title = 'Blog'; nav = 'blog'; }
+  else if (path.startsWith('blog/')) { const x = postBySlug(path.slice(5)); html = viewPost(path.slice(5)); title = x ? plain(x.title) : 'Not found'; nav = 'blog'; }
+  else if (path === 'guidelines') { html = viewGuidelines(); title = 'Guidelines'; nav = 'guidelines'; }
   else if (path === 'about') { html = viewAbout(); title = 'About'; nav = 'about'; }
   else if (path === 'contribute') { html = viewContribute(); title = 'Contribute'; nav = 'contribute'; }
-  else if (path.startsWith('random')) {
+  else if (path === 'submit') { html = viewSubmit(params); title = 'Submit'; nav = 'contribute'; }
+  else if (path === 'moderate') { html = viewModerate(params); title = 'Moderation'; nav = 'moderate'; }
+  else if (path === 'edit') { html = viewEdit(params); title = 'Edit'; nav = 'moderate'; }
+  else if (path === 'random' || path.startsWith('random/')) {
     const status = path.split('/')[1] || '';
     const p = randomProblem(status === 'any' ? '' : (status || 'open'));
     location.replace(p ? problemUrl(p) : '#/problems');
@@ -58,7 +66,12 @@ function route() {
   if (window.MathJax && typeof MathJax.typesetClear === 'function') MathJax.typesetClear();
   main.innerHTML = html;
   document.title = title ? `${title} · ${SITE.name}` : `${SITE.name} · ${SITE.subtitle}`;
+  if (typeof initModeration === 'function') initModeration();   // before setNav: it adds the Moderate link for a signed-in moderator
   setNav(nav);
+  if (typeof initSubmitForm === 'function') initSubmitForm();
+  if (typeof initProgressChart === 'function') initProgressChart();
+  if (typeof initModeratePage === 'function') initModeratePage();
+  if (typeof initEditPage === 'function') initEditPage();
   const to = params.get('to') && document.getElementById(params.get('to'));
   if (to) to.scrollIntoView(); else window.scrollTo(0, 0);
   if (!firstRender) main.focus({ preventScroll: true });
@@ -97,7 +110,14 @@ document.addEventListener('click', e => {
     return;
   }
   if (e.target.closest('[data-json]')) {
-    const data = { site: SITE.name, subtitle: SITE.subtitle, updated: latest(), goals: GOALS.map(g => ({ id: g.id, numeral: g.numeral, title: g.title, summary: g.summary })), problems: PROBLEMS.map(p => ({ ...p, updated: updatedOf(p), statusSince: statusSince(p) })) };
+    const data = {
+      site: SITE.name, subtitle: SITE.subtitle, updated: latest(),
+      goals: GOALS.map(g => ({ id: g.id, numeral: g.numeral, title: g.title, summary: g.summary })),
+      problems: PROBLEMS.map(p => ({ ...p, updated: updatedOf(p), statusSince: statusSince(p) })),
+      contributions: typeof CONTRIBUTIONS !== 'undefined' ? CONTRIBUTIONS : [],
+      posts: typeof POSTS !== 'undefined' ? POSTS : [],
+      timeline: typeof statusTimeline === 'function' ? statusTimeline() : []
+    };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);

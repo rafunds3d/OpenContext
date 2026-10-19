@@ -80,7 +80,7 @@ mjx-container[display="true"] { margin: .9em 0 !important; }
 .stat { color: var(--ink); display: inline-flex; align-items: baseline; gap: .45rem; }
 .stat strong { font-size: 1.7rem; font-weight: 700; line-height: 1; }
 .stat span { font-variant: small-caps; letter-spacing: .05em; color: var(--ink-2); }
-.stat:hover { text-decoration: none; color: var(--red); }
+a.stat:hover { text-decoration: none; color: var(--red); }
 
 /* search and controls */
 .search { display: flex; gap: .5rem; flex-wrap: wrap; margin: 1rem 0 .3rem; }
@@ -114,7 +114,7 @@ mjx-container[display="true"] { margin: .9em 0 !important; }
 .cbox { border: 1.5px solid var(--brown); background: var(--tan); }
 .pbox-title, .cbox-title { position: absolute; top: -.95rem; left: 50%; transform: translateX(-50%); font-family: var(--sans); font-weight: 700; font-size: .92rem; line-height: 1.3; color: #fff; padding: .28rem .85rem; border-radius: 5px; white-space: nowrap; max-width: calc(100% - 1.5rem); overflow: hidden; text-overflow: ellipsis; }
 .pbox-title { background: var(--red-tab); border: 1.5px solid var(--red-border); }
-.cbox-title { background: var(--amber); border: 1.5px solid var(--brown); }
+.cbox-title { background: var(--amber); border: 1.5px solid var(--brown); color: var(--ink); }   /* dark on amber: white on it is too faint to read */
 .pbox p, .cbox p { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
 .pbox p:last-child, .cbox p:last-child { margin-bottom: 0; }
 .cbox dl { margin: 0; }
@@ -123,9 +123,8 @@ mjx-container[display="true"] { margin: .9em 0 !important; }
 .cbox dt, .cbox dd { display: inline; margin: 0; }
 .cbox dt { font-weight: 700; }
 .pbox .more { text-align: right; margin: .9rem 0 0; font-size: .95rem; }
-.pbox h3 { font-size: 1.05rem; margin: 0 0 .5rem; }
 
-/* apple icons: red = open problem, outline = under revision, grey = resolved, golden = long-term goal */
+/* apple icons: red = open problem, outline = under revision, grey = solved, golden = long-term goal */
 .apple { width: 1.05em; height: 1.05em; vertical-align: -.16em; flex: none; --apple-body: #c00808; --apple-leaf: #3f8f3f; --apple-stem: #5a3a1a; --apple-stroke: none; }
 .apple-goal { --apple-body: #e6b422; }
 .apple-revision { --apple-body: #fff; --apple-stroke: #c00808; }
@@ -138,10 +137,9 @@ mjx-container[display="true"] { margin: .9em 0 !important; }
 /* status labels, set like \texttt{} in the paper */
 .st { font-family: var(--mono); font-size: .82rem; border: 1px solid currentColor; border-radius: 3px; padding: .02rem .4rem; white-space: nowrap; line-height: 1.5; }
 .st-open { color: var(--ink-2); }
-.st-proved, .st-complete { color: var(--green); }
-.st-disproved { color: var(--red); }
+.st-solved { color: var(--green); }
 .st-under-revision { color: var(--blue); }
-.gchip { font-weight: 700; font-size: .85rem; border: 1px solid var(--ink); border-radius: 3px; padding: 0 .35rem; color: var(--ink); white-space: nowrap; }
+.gchip { display: inline-block; min-width: 1.5rem; text-align: center; font-weight: 700; font-size: .85rem; line-height: 1.55; border: 1px solid var(--ink); border-radius: 3px; padding: .1rem .35rem; color: var(--ink); white-space: nowrap; }   /* at least 24px to tap */
 .gchip:hover { text-decoration: none; background: var(--ink); color: #fff; }
 .chips { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .7rem; }
 .chip { font-size: .85rem; color: var(--ink-2); border: 1px solid var(--rule-2); border-radius: 999px; padding: .05rem .55rem; }
@@ -177,10 +175,80 @@ mjx-container[display="true"] { margin: .9em 0 !important; }
 .people div { margin: .2rem 0; }
 .steps { padding-left: 1.4rem; margin: 0 0 1rem; }
 .steps li { margin: .4rem 0; }
-.toc { list-style: none; margin: 0 auto 1rem; padding: 0; max-width: 28rem; font-size: 1rem; }
-.toc li { display: flex; justify-content: space-between; gap: 1rem; padding: .15rem 0; }
-.toc a { color: var(--ink); }
-.toc .pg { color: var(--red); }
+
+/* forms (the Submit page), set like the search box */
+.form { margin: 1.4rem 0 0; }
+.form fieldset { border: 1px solid var(--rule); border-radius: 4px; padding: .5rem 1rem 1rem; margin: 0 0 1.2rem; min-width: 0; }
+.form legend { font-family: var(--sans); font-weight: 700; font-size: .85rem; padding: 0 .4rem; }
+.form fieldset[hidden] { display: none; }
+.field { margin: .75rem 0 0; }
+.field label, .field .label { display: block; font-family: var(--sans); font-weight: 700; font-size: .85rem; margin-bottom: .25rem; }
+.field label.check, .checks label { display: block; font-family: var(--serif); font-weight: 500; font-size: 1rem; margin: .25rem 0; }
+.field label.check input, .checks label input { margin-right: .4rem; }
+.field input[type="text"], .field input[type="email"], .field input[type="url"], .field textarea, .field select { display: block; width: 100%; font: inherit; font-size: 1rem; padding: .45rem .7rem; border: 1px solid var(--ink); border-radius: 3px; background: #fff; color: var(--ink); }
+.field textarea { font-family: var(--mono); font-size: .9rem; line-height: 1.45; resize: vertical; }
+.field .help { font-size: .88rem; color: var(--ink-3); margin: .3rem 0 0; }
+.field .help .good { color: var(--green); }
+.field .help .bad { color: var(--red); }
+.field .help .warn { color: var(--brown); }
+.form-actions { margin: 1rem 0 0; display: flex; gap: .8rem; align-items: center; flex-wrap: wrap; }
+.hp { position: absolute; left: -999px; width: 1px; height: 1px; opacity: 0; }
+.callout { border-left: 3px solid var(--green); background: #f4faf4; padding: .6rem .9rem; margin: 1rem 0 1.2rem; font-size: .98rem; }
+.callout.err { border-left-color: var(--red); background: var(--red-tint); }
+.callout[hidden] { display: none; }
+#entry-code { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* contributions and posts */
+.flag { font-family: var(--mono); font-size: .78rem; color: var(--brown); border: 1px solid currentColor; border-radius: 3px; padding: 0 .35rem; margin-left: .3rem; }
+.contrib-sum { margin: .3rem 0 0; font-size: .98rem; }
+.contrib-sum p { margin: 0 0 .5rem; }
+.contrib-meta { margin: .1rem 0 0; font-size: .9rem; color: var(--ink-3); }
+.post-title { text-align: center; font-size: 1.35rem; margin: 1.6rem 0 .3rem; }
+.post-meta { text-align: center; font-size: .92rem; color: var(--ink-3); margin-bottom: 1.4rem; }
+
+/* moderation: the Edit buttons a signed-in moderator sees, the Edit form, the queue of submissions */
+.edit-link { display: inline-block; font-family: var(--sans); font-size: .7rem; font-weight: 700; line-height: 1.3; padding: .1rem .5rem; border: 1px solid var(--ink); border-radius: 3px; color: var(--ink); vertical-align: middle; white-space: nowrap; }
+a.edit-link:hover { background: var(--ink); color: #fff; text-decoration: none; }
+.sec-title .edit-link, .post-meta .edit-link, .contrib-meta .edit-link { margin-left: .4rem; }
+.mod-bar { text-align: center; font-size: .95rem; margin: -.6rem 0 1.2rem; }
+.mod-list { columns: 2; column-gap: 2rem; list-style: none; margin: 0; padding: 0; font-size: .95rem; }
+.mod-list li { margin: .15rem 0; break-inside: avoid; }
+.rows-edit { margin: .3rem 0 0; }
+.row-edit { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: .2rem .8rem; align-items: end; border-top: 1px dotted var(--rule-2); padding: .3rem 0 .6rem; }
+.row-edit .field { margin: .3rem 0 0; }
+.row-edit .field label { font-size: .78rem; margin-bottom: .15rem; }
+.row-edit .wide, .row-edit .row-tools { grid-column: 1 / -1; }
+.row-edit .row-tools { margin: .2rem 0 0; text-align: right; }
+.row-edit[data-auto] { background: var(--tan); padding: .3rem .5rem .6rem; margin: .3rem -.5rem 0; }
+.linklike.small { font-size: .85rem; color: var(--ink-2); }
+.field .help code { font-size: .85em; }
+.preview { border: 1px dashed var(--rule-2); border-radius: 6px; padding: .6rem 1rem .8rem; margin: 1rem 0; }
+.preview .pbox { margin-top: 1.6rem; }
+.callout.ok { border-left-color: var(--green); background: #f4faf4; }
+.callout.small { font-size: .9rem; padding: .45rem .8rem; }
+.pulls { list-style: none; margin: 0; padding: 0; border-bottom: 1px solid var(--rule); }
+.pull { border-top: 1px solid var(--rule); padding: .7rem 0 .8rem; }
+.pull-title { margin: 0 0 .15rem; font-weight: 700; }
+.pull-title .small { font-weight: 500; }
+.pull-actions { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin: .5rem 0 0; }
+.pull-body, .patch { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 22rem; font-size: .8rem; }
+.pull details summary { cursor: pointer; color: var(--ink-2); }
+.decline-box { margin: .5rem 0 0; }
+
+/* the progress chart */
+.chart-wrap { position: relative; margin: .6rem 0 .4rem; }
+.chart-scroll { overflow-x: auto; }                                   /* on a phone the chart keeps a legible size and scrolls sideways */
+.chart { width: 100%; min-width: 560px; height: auto; display: block; font-family: var(--sans); }
+.chart text { font-size: 11px; fill: var(--ink-2); paint-order: stroke; stroke: var(--paper); stroke-width: 3px; stroke-linejoin: round; }
+.chart .grid { stroke: var(--rule); stroke-width: 1; }
+.chart .axis { stroke: var(--rule-2); stroke-width: 1; }
+.chart .series { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.chart .leader { stroke: var(--rule-2); stroke-width: 1; }
+.chart .cross { stroke: var(--ink-3); stroke-width: 1; pointer-events: none; }
+.chart-tip { position: absolute; pointer-events: none; background: #fff; border: 1px solid var(--ink); border-radius: 3px; padding: .35rem .6rem; font-family: var(--sans); font-size: .82rem; line-height: 1.5; color: var(--ink); white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,.12); z-index: 2; }
+.chart-tip[hidden] { display: none; }
+.legend { display: flex; flex-wrap: wrap; gap: .3rem 1.2rem; justify-content: center; font-family: var(--sans); font-size: .85rem; color: var(--ink-2); margin: -.4rem 0 0; }
+.legend i, .chart-tip i { display: inline-block; width: 1.1em; height: 3px; vertical-align: middle; margin-right: .45em; border-radius: 2px; }
 
 @media (max-width: 640px) {
   body { font-size: 1.05rem; }
@@ -189,9 +257,12 @@ mjx-container[display="true"] { margin: .9em 0 !important; }
   .row-meta, .row-q { grid-column: 1 / -1; }
   .goal { grid-template-columns: 3.4rem minmax(0, 1fr); }
   .goal-count { grid-column: 2; }
+  .mod-list { columns: 1; }
   .hist li { grid-template-columns: 1fr; gap: .1rem; }
   .masthead .title { font-size: 1.7rem; }
-  .prose p, .prose li, .pbox p, .cbox dd, .masthead .abstract { text-align: left; }
+  .prose p, .prose li, .pbox p, .cbox dl > div, .masthead .abstract { text-align: left; }
+  /* the problem page's title tab wraps instead of being cut off */
+  h1.pbox-title { position: static; transform: none; display: block; width: fit-content; max-width: 100%; margin: -2.45rem auto .8rem; white-space: normal; overflow: visible; text-align: center; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }

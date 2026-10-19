@@ -1,0 +1,32 @@
+# The submission service, deployed to Cloudflare Workers with `npx wrangler deploy` from this folder. See README.md.
+name = "opencontext-submit"
+main = "worker.js"
+compatibility_date = "2025-09-01"
+
+[vars]
+GITHUB_REPO = "rafunds3d/OpenContext"                    # owner/repository that receives the pull requests
+GITHUB_BASE = "main"                                     # branch GitHub Pages deploys from
+SITE_URL = "https://rafunds3d.github.io/OpenContext/"    # where the confirmation link sends people back to
+SITE_NAME = "OpenContext"
+ALLOWED_ORIGIN = "https://rafunds3d.github.io"           # the site's origin, for browsers' cross-origin checks
+MAIL_PROVIDER = "brevo"                                  # "brevo" (verify one sender address) or "resend" (verify a domain)
+MAIL_FROM = "OpenContext <rafael.wagner@uni-ulm.de>"     # the verified sender
+# Institutional domains missing from the public university list, comma-separated. Keep in step with SITE.submit.extraDomains.
+EXTRA_DOMAINS = "perimeterinstitute.ca,oeaw.ac.at,iqoqi-vienna.at,mpg.de,cnrs.fr,cern.ch,ictp.it,icfo.eu,inl.int,ist.ac.at,ucl.ac.uk,cwi.nl,weizmann.ac.il"
+# The moderators, who can sign in on the site (Moderators link in the footer) to edit entries and accept submissions:
+# "Name <address>" entries separated by commas, or bare addresses. The name goes on the commits they make.
+MODERATOR_EMAILS = "Rafael Wagner <rafael.wagner@uni-ulm.de>, John H. Selby <john.h.selby@gmail.com>"
+# What a moderator's save becomes: "direct" commits to GITHUB_BASE at once (the site redeploys in a minute or two);
+# "pull-request" opens a pull request for another moderator to merge. Use "pull-request" if the branch is protected.
+EDIT_MODE = "direct"
+
+# Pending submissions wait here for their confirmation link (24 h), together with the filing locks, the hourly counters,
+# the moderators' sign-in links (15 min) and their sessions (30 days).
+# Create it with `npx wrangler kv namespace create SUBMISSIONS` and paste the id it prints.
+[[kv_namespaces]]
+binding = "SUBMISSIONS"
+id = "PASTE_THE_ID_PRINTED_BY_wrangler_kv_namespace_create"
+
+# Secrets, set with `npx wrangler secret put NAME` (never written here):
+#   GITHUB_TOKEN   a fine-grained personal access token for the repository above, Contents: read and write, Pull requests: read and write
+#   MAIL_API_KEY   the Brevo (or Resend) API key
