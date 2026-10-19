@@ -19,7 +19,7 @@ const PROBLEMS = [
     goals: ["classicality"],
     topics: ["Continuous variables", "Wigner function", "Entropic uncertainty relations", "Quasiprobability representations"],
     posedBy: ["Rafael Wagner", "Tobias Haas", "Ulysse Chabaud"],
-    revisedBy: [],
+    revisedBy: ["Rafael Wagner"],
     curatedBy: [],
     statement: tex`Let \(\rho\) be a state of a continuous-variable bosonic system whose Wigner function \(W_{\rho}(x,p)\) is nonnegative, and define the Wigner entropy
 \[h(W_{\rho}) := -\int W_{\rho}(x,p)\,\ln W_{\rho}(x,p)\,\mathrm{d}x\,\mathrm{d}p .\]
@@ -70,8 +70,8 @@ The problem traces to Goal I, Reconceptualization of classicality, on two of its
     status: "open",
     goals: ["framework"],
     topics: ["Indefinite causal order", "Quantum SWITCH", "Higher-order operations", "Epistemically restricted models"],
-    posedBy: [],
-    revisedBy: [],
+    posedBy: ["Rafael Wagner"],
+    revisedBy: ["Rafael Wagner"],
     curatedBy: [],
     statement: tex`Take \(\mathcal{S}\) to be the quantum SWITCH. Is there a scenario in which a collection of channels \(\{A\}\), \(\{B\}\), taken as inputs to the quantum SWITCH, together with the resulting channels \(\{\mathcal{S}(A,B)\}\), coherent states, and effects, <em>can</em> be explained by means of a generalized noncontextual model?`,
     background: tex`The quantum SWITCH is a higher-order operation \(\mathcal{S}\) that takes two channels \(A,B:\mathcal{B}(\mathcal{H})\to\mathcal{B}(\mathcal{H})\) and outputs a channel on a control qubit together with the system,
@@ -110,8 +110,8 @@ The problem traces to Goal II, Towards a better framework. A causally “unscram
     status: "open",
     goals: ["applications"],
     topics: ["Self-consistent tomography", "Entanglement certification", "Sample complexity", "Experimental tests"],
-    posedBy: [],
-    revisedBy: [],
+    posedBy: ["Yujie Zhang"],
+    revisedBy: ["Rafael Wagner"],
     curatedBy: [],
     statement: tex`Consider a bipartite state \(\rho^{AB}\) with known local dimension \(d\), measured by uncharacterized local devices, so that the statistics are
 \[p(ab|xy) = \operatorname{Tr}\!\left[(M^A_{a|x}\otimes M^B_{b|y})\,\rho^{AB}\right].\]
