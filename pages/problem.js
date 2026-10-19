@@ -17,8 +17,9 @@ function problemArticle(p) {
   const contribs = contributionsFor(p);
   const posts = postsForProblem(p);
   const goals = problemGoals(p);
-  const cite = `${SITE.name}, Problem ${p.number}: ${plain(p.title)} (status: ${statusInfo(p.status).label}, last updated ${fmtDate(updatedOf(p))}). ${siteUrl()}${problemUrl(p)}`;
-  const posed = (p.posedBy || []).length ? names(p.posedBy) : '<span class="muted">to be recorded</span>';
+  const cite = bibtexFor(p);
+  const recorded = list => (list || []).length ? names(list) : '<span class="muted">to be recorded</span>';
+  const posed = recorded(p.posedBy), revised = recorded(p.revisedBy);
   const rev = p.status === 'under-revision' ? revisionStats(p) : null;
   const byKinds = kinds => [...new Set(contribs.filter(c => kinds.includes(c.kind)).flatMap(c => c.by || []))];
   const advanced = [...new Set([...(p.history || []).filter(h => h.kind === 'advance').flatMap(h => h.by || []), ...byKinds(['claim', 'partial', 'negative', 'reformulation', 'decomposition', 'evidence'])])];
@@ -30,6 +31,7 @@ function problemArticle(p) {
       <span>${badge(p)} <span class="small">since ${fmtDate(statusSince(p), true)}</span></span>
       <span><b>Goal${goals.length === 1 ? '' : 's'}:</b> ${goals.map(g => `<a href="#/agenda?to=${g.id}">${g.numeral}. ${esc(g.title)}</a>`).join(', ') || '<span class="muted">none</span>'}</span>
       <span><b>Posed by:</b> ${posed}</span>
+      <span><b>Revised by:</b> ${revised}</span>
       <span><b>Updated:</b> ${fmtDate(updatedOf(p), true)}</span>
     </div>
     ${p.notice ? `<p class="notice">${p.notice}</p>` : ''}
@@ -48,13 +50,14 @@ function problemArticle(p) {
     <h2 class="sec-title">${letter()} Attribution and citation</h2>
     <dl class="people">
       <div><dt>Posed by:</dt> <dd>${posed}${p.ai && aiUseLabel(p.ai) ? ` <span class="muted small">(${esc(aiUseLabel(p.ai))})</span>` : ''}</dd></div>
+      <div><dt>Revised by:</dt> <dd>${revised}</dd></div>
       ${(p.curatedBy || []).length ? `<div><dt>Curated by:</dt> <dd>${names(p.curatedBy)}</dd></div>` : ''}
       ${advanced.length ? `<div><dt>Advanced by:</dt> <dd>${names(advanced)}</dd></div>` : ''}
       ${verified.length ? `<div><dt>Verified by:</dt> <dd>${names(verified)}</dd></div>` : ''}
       ${explained.length ? `<div><dt>Explained by:</dt> <dd>${names(explained)}</dd></div>` : ''}
     </dl>
-    <p class="small" style="margin-top:.8rem">Work that addresses this problem should cite the people who posed it and the companion paper, and acknowledge any partial result or discussion recorded here that proved useful. To cite this entry:</p>
-    <pre class="cite">${esc(cite)}</pre>
+    <p class="small" style="margin-top:.8rem">Work that addresses this problem should cite the people who posed it and the companion paper, and acknowledge any partial result or discussion recorded here that proved useful. To cite this entry: <button class="btn btn-quiet btn-small" type="button" data-copy="cite-${esc(p.number)}">Copy</button></p>
+    <pre class="cite bibtex" id="cite-${esc(p.number)}">${esc(cite)}</pre>
     ${topicChips(p)}
     ${SITE.repo ? `<p class="small muted" style="margin-top:1rem">Spotted an error? <a href="${esc(SITE.repo)}/issues" rel="noopener">Report it on GitHub</a>${SITE.contact ? ` or write to <a href="mailto:${esc(SITE.contact)}">${esc(SITE.contact)}</a>` : ''}.</p>` : ''}
   </article>`;

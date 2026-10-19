@@ -54,9 +54,9 @@ Use a branch and a pull request for changes you want someone else to look at fir
 Each entry in `data/problems.js` has:
 
 - `number`, `title`, `status` (`open`, `under-revision`, `solved`), `goals` (ids from `data/goals.js`), `topics`;
-- `posedBy` and `curatedBy` (names), optionally `ai` (`none`, `partial`, `full`: how much AI assistance went into posing it);
+- `posedBy`, `revisedBy` and `curatedBy` (names; an empty `posedBy` or `revisedBy` shows as "to be recorded"), optionally `ai` (`none`, `partial`, `full`: how much AI assistance went into posing it);
 - `statement`, `background`, and, following the curation criteria of the paper's BOX I, `relevance` (how the problem is motivated within the literature and which goals it traces to) and `significance` (how its resolution would advance those goals); an optional `notice` shown as a callout;
-- `history`: dated entries of kind `posed`, `status`, `advance`, `interest` or `note`, each with the people involved and an optional link. A `status` entry carries `to: "under-revision"` or `to: "solved"` (or `to: "open"` when a problem is reopened); the newest one sets the date the current status has held since, and together they draw the progress chart. The newest entry of any kind sets "last updated";
+- `history`: dated entries of kind `posed`, `status`, `advance`, `interest` or `note`, each with the people involved and an optional link. A `status` entry carries `to: "under-revision"` or `to: "solved"` (or `to: "open"` when a problem is reopened); the newest one sets the date the current status has held since, and together they draw the progress chart. The newest entry of any kind sets "last updated", and the `posed` entry sets the date of the proposal used in the BibTeX citation;
 - `references`, each with an optional link.
 
 Keep the line `/* new problems are added above this line */` at the end of the list: the submission service inserts entries there.
