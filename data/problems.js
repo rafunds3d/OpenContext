@@ -18,14 +18,14 @@ const PROBLEMS = [
     status: "open",
     goals: ["classicality"],
     topics: ["Continuous variables", "Wigner function", "Entropic uncertainty relations", "Quasiprobability representations"],
-    posedBy: [],
+    posedBy: ["Rafael Wagner", "Tobias Haas", "Ulysse Chabaud"],
+    revisedBy: [],
     curatedBy: [],
     statement: tex`Let \(\rho\) be a state of a continuous-variable bosonic system whose Wigner function \(W_{\rho}(x,p)\) is nonnegative, and define the Wigner entropy
 \[h(W_{\rho}) := -\int W_{\rho}(x,p)\,\ln W_{\rho}(x,p)\,\mathrm{d}x\,\mathrm{d}p .\]
 Let \(b_\star := \inf_{\rho\in\mathcal{W}_+} h(W_\rho)\) be the infimum of the Wigner entropy over the set \(\mathcal{W}_+\) of such states; it is known that \(\ln(2\pi) \leq b_\star < \ln(\pi)+1\). Is
 \[h(W_{\rho}) \;\geq\; b_\star\]
 a valid generalized noncontextuality inequality for some natural prepare-and-measure scenario involving quadrature measurements on such states, that is, does the bound \(b_\star\) follow from noncontextuality alone, and can \(b_\star\) be determined?`,
-    notice: "The Wigner-entropy conjecture, which this entry originally asked about, has been refuted by three independent works. Following the revised companion paper, the statement now asks about the true infimum \\(b_\\star\\) of the Wigner entropy over Wigner-positive states.",
     background: tex`While generalized noncontextuality is well understood for discrete-variable (DV) systems, its extension to continuous variables (CV) is comparatively underdeveloped. For the Kochen–Specker formulation there are CV scenarios in which the notion can be made precise [Barbosa et al. 2022], quantified and experimentally investigated, and in which contextuality is equivalent to the negativity of the Wigner function [Booth, Chabaud and Emeriau 2022]. For generalized contextuality more than one proposal exists [Jokinen et al. 2026], and the picture is more nuanced, although there seems to be a close relationship between generalized contextuality and Wigner negativity, both for DV systems [Schmid et al. 2022] and in some proposed CV definitions [Haferkamp and Bermejo-Vega 2021]. A concrete problem helps to work around the space of possible definitions, putting those proposals to the test.
 
 For a bosonic mode with quadratures \(x\) and \(p\), a state \(\rho\) has a Wigner quasiprobability representation \(W_\rho(x,p)\) on phase space which, unlike a probability distribution, may take negative values. The states for which it does not, the Wigner-positive states \(\mathcal{W}_+\), have a well-defined differential entropy \(h(W_\rho)\), the Wigner entropy [Van Herstraeten and Cerf 2021]; proposed extensions of this functional to arbitrary states are not unique. Since \(h(W_\rho)\) is invariant under Gaussian transformations and the uncertainty principle forbids arbitrarily sharp joint localization in \(x\) and \(p\), a state-independent lower bound is natural to expect. The Wigner-entropy conjecture (WEC) asserted
@@ -38,9 +38,7 @@ The conjecture had been established for passive states, Wigner-positive mixtures
 The problem traces to Goal I, Reconceptualization of classicality, on two of its three fronts: subsumption, since positive quasiprobability representations and the Gaussian subtheory are among the notions of classicality that generalized noncontextuality is meant to recover, and stringency, since it bears on whether uncertainty relations, which alone do not imply contextuality, can nonetheless be recast as noncontextuality inequalities.`,
     significance: tex`A resolution would advance Goal I in three ways. First, of independent interest to researchers working on Wigner representations, progress on it may lead to further advances in understanding the Wigner entropy itself, including the value of \(b_\star\). Second, should the bound turn out to be a noncontextuality inequality, its connection to entropic uncertainty relations, together with the established link between nonclassicality as captured by uncertainty relations and contextuality [Catani et al. 2022], would significantly strengthen the case for a broader relationship between generalized noncontextuality and uncertainty relations. Since progress requires linking generalized noncontextuality, as a notion of classicality, to the positivity of quasiprobability representations, it extends the structure theorems of [Spekkens 2008; Schmid et al. 2024; Wagner et al. 2025] into the CV setting. Third, such a link would hint at a link between contextuality and the even more fundamental Wigner majorization conjecture in phase space, which seeks to express the uncertainty principle in the most general terms. A negative answer is informative too: it would locate a natural CV entropic bound that noncontextuality alone does not explain.`,
     history: [
-      { date: "2026-10-03", kind: "posed", text: "Entry created from Problem I of the companion paper.", by: [] },
-      { date: "2026-10-03", kind: "note", text: "The Wigner-entropy conjecture has been reported false; the statement will be revised.", by: [] },
-      { date: "2026-10-17", kind: "note", text: "Statement revised following the revised companion paper: the problem now asks whether the true infimum \\(b_\\star\\) of the Wigner entropy, with \\(\\ln(2\\pi)\\leq b_\\star<\\ln(\\pi)+1\\), follows from noncontextuality, and for its value. Title changed from “Contextuality in the Wigner-entropy conjecture”.", by: [] }
+      { date: "2026-10-03", kind: "posed", text: "Entry created from Problem I of the companion paper.", by: [] }
     ],
     references: [
       { text: "Z. Van Herstraeten and N. J. Cerf, Quantum Wigner entropy, Phys. Rev. A 104, 042211 (2021)", url: "https://doi.org/10.1103/PhysRevA.104.042211" },
@@ -73,6 +71,7 @@ The problem traces to Goal I, Reconceptualization of classicality, on two of its
     goals: ["framework"],
     topics: ["Indefinite causal order", "Quantum SWITCH", "Higher-order operations", "Epistemically restricted models"],
     posedBy: [],
+    revisedBy: [],
     curatedBy: [],
     statement: tex`Take \(\mathcal{S}\) to be the quantum SWITCH. Is there a scenario in which a collection of channels \(\{A\}\), \(\{B\}\), taken as inputs to the quantum SWITCH, together with the resulting channels \(\{\mathcal{S}(A,B)\}\), coherent states, and effects, <em>can</em> be explained by means of a generalized noncontextual model?`,
     background: tex`The quantum SWITCH is a higher-order operation \(\mathcal{S}\) that takes two channels \(A,B:\mathcal{B}(\mathcal{H})\to\mathcal{B}(\mathcal{H})\) and outputs a channel on a control qubit together with the system,
@@ -112,6 +111,7 @@ The problem traces to Goal II, Towards a better framework. A causally “unscram
     goals: ["applications"],
     topics: ["Self-consistent tomography", "Entanglement certification", "Sample complexity", "Experimental tests"],
     posedBy: [],
+    revisedBy: [],
     curatedBy: [],
     statement: tex`Consider a bipartite state \(\rho^{AB}\) with known local dimension \(d\), measured by uncharacterized local devices, so that the statistics are
 \[p(ab|xy) = \operatorname{Tr}\!\left[(M^A_{a|x}\otimes M^B_{b|y})\,\rho^{AB}\right].\]
@@ -123,7 +123,6 @@ What is the minimum total number of target copies required for a protocol return
 \Pr(\mathsf{certify})&\geq1-\delta &&\text{if } E_{\mathrm{tr}}(\rho^{AB})\geq\gamma,
 \end{aligned}\]
 when the operational identities defining \(\mathcal{NC}\) must be inferred from the same finite experimental data? How does this number scale with \(d\), \(\gamma\), \(\delta\), and the number of distinct local effects, counting all copies used to infer the identities?`,
-    notice: "Following the revised companion paper, this entry has been restated. It originally asked for the sample complexity of theory-independent (GPT) tomography; it now asks for the sample complexity of self-consistent entanglement certification with noncontextuality inequalities, a gauge-independent task that benchmarks tomography together with the subsequent noncontextuality test.",
     background: tex`Compared to the Bell and Kochen–Specker literature, experimental investigations of generalized contextuality remain relatively limited, with only a handful of experiments reported [Mazurek et al. 2016; Mazurek et al. 2021; Giordani et al. 2023; Spekkens et al. 2009; Zhan et al. 2017; Zhang et al. 2019; Zhang et al. 2026; Gama et al. 2026; Rossi et al. 2026]. Generalized contextuality tests can address loopholes arising in Kochen–Specker tests [Pusey, del Rio and Meyer 2019; Schmid et al. 2025; Selby et al. 2023; Gitton and Woods 2024], and can be made robust [Pusey 2018; Fonseca et al. 2025; Selby et al. 2024; Khoshbin, Catani and Leifer 2024; Rossi et al. 2023]. Yet, despite our increasing ability to control high-dimensional systems, much of the development around testing generalized contextuality remains concerned with low-dimensional examples, and it is not entirely clear how these tests scale.
 
 A first difficulty is establishing the operational equivalences that enter the definition of generalized noncontextuality. Some form of tomography is required for this purpose [Pusey, del Rio and Meyer 2019; Schmid et al. 2025]. If one wishes to remain agnostic about the underlying theory, in the instrumentalist sense of operational probabilistic theories, this can be done within the framework of generalized probabilistic theories (GPTs) through theory-agnostic tomography, demonstrated experimentally for a photon's polarization degree of freedom [Mazurek et al. 2021] and for a three-level photonic system [Grabowecky et al. 2022], or through other standard self-consistent tomography [Nielsen et al. 2021] within the framework of quantum theory.
@@ -138,8 +137,7 @@ When the exact identities are supplied independently, suitable local projective 
 The problem traces to Goal III, Useful applications, through its witnessing theme: devising tests that are tighter, cheaper to implement and robust, scaling them to high-dimensional systems, and carrying out the corresponding experiments.`,
     significance: tex`Resolving the problem would clarify the experimental resources needed for a concrete application of generalized noncontextuality, entanglement certification with uncharacterized local devices, counting the cost of establishing the operational identities and not only of estimating the probabilities. The scaling with \(d\) and with the number of distinct local effects would say how such tests extend from the low-dimensional examples studied so far to larger systems, which is the scaling question the witnessing theme of Goal III raises, and comparing it with the \(\Theta_d(\gamma^{-2}\log(1/\delta))\) cost when the identities are supplied would isolate the price of self-consistency. This bears directly on the goal of making the failure of classicality, as captured by generalized noncontextuality, a certified resource witnessed in experiments.`,
     history: [
-      { date: "2026-10-03", kind: "posed", text: "Entry created from Problem III of the companion paper.", by: [] },
-      { date: "2026-10-19", kind: "note", text: "Statement revised following the revised companion paper: the problem now asks for the sample complexity of self-consistent entanglement certification with noncontextuality inequalities, when the operational identities must be inferred from the same data. Title changed from “Sample complexity of theory-independent tomography”.", by: [] }
+      { date: "2026-10-03", kind: "posed", text: "Entry created from Problem III of the companion paper.", by: [] }
     ],
     references: [
       { text: "M. D. Mazurek, M. F. Pusey, R. Kunjwal, K. J. Resch and R. W. Spekkens, An experimental test of noncontextuality without unphysical idealizations, Nat. Commun. 7, 11780 (2016)", url: "" },

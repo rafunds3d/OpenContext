@@ -225,7 +225,7 @@ export function buildEntry(sub, extra) {
   const lines = s => String(s || '').split('\n').map(x => x.trim()).filter(Boolean);
   const text = sanitizeMarkup;
   if (type === 'problem') return {
-    number: extra.number, title: f.title, status: 'open', goals: list(f.goals), topics: list(f.topics), posedBy: by, curatedBy: [], ai,
+    number: extra.number, title: f.title, status: 'open', goals: list(f.goals), topics: list(f.topics), posedBy: by, revisedBy: [], curatedBy: [], ai,
     statement: text(f.statement), background: text(f.background), relevance: text(f.relevance), significance: text(f.significance),
     history: [{ date, kind: 'posed', text: 'Problem posed through the site.', by }],
     references: lines(f.references).map(l => { const i = l.indexOf('|'); return i < 0 ? { text: l, url: '' } : { text: l.slice(0, i).trim(), url: webUrl(l.slice(i + 1).trim()) }; })

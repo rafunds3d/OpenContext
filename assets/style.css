@@ -169,6 +169,7 @@ a.stat:hover { text-decoration: none; color: var(--red); }
 .refs { padding-left: 1.5rem; margin: 0 0 1rem; }
 .refs li { margin: .35rem 0; }
 .cite { white-space: pre-wrap; font-family: var(--serif); font-size: .95rem; background: #fafafa; }
+.cite.bibtex { white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--mono); font-size: .82rem; line-height: 1.5; }
 .people { margin: 0; }
 .people dt { font-weight: 700; display: inline; }
 .people dd { display: inline; margin: 0; }

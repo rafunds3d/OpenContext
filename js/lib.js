@@ -32,6 +32,28 @@ const latest = () => PROBLEMS.reduce((m, p) => updatedOf(p) > m ? updatedOf(p) :
 const byDateDesc = (a, b) => updatedOf(b).localeCompare(updatedOf(a)) || a.number - b.number;
 const byNumber = (a, b) => a.number - b.number;
 const problemUrl = p => `#/problem/${p.number}`;
+/* The date a problem was proposed: its 'posed' history entry, else its earliest dated entry, else the day the database went live. */
+const posedOn = p => { const h = (p.history || []).filter(x => x.date); const posed = h.filter(x => x.kind === 'posed').map(x => x.date).sort()[0]; return posed || h.map(x => x.date).sort()[0] || SITE.started; };
+/* A BibTeX @misc entry for a problem, built from its data. Names keep their given order, without a trailing "(Institution)";
+   with no posers recorded yet the database itself stands as the author. */
+const bibEsc = s => String(s ?? '').replace(/[\\{}]/g, '').replace(/([&%$#_])/g, '\\$1');
+function bibtexFor(p) {
+  const authors = (p.posedBy || []).map(n => bibEsc(String(n).replace(/\s*\([^)]*\)\s*$/, ''))).filter(Boolean);
+  const posed = posedOn(p), url = siteUrl() + problemUrl(p);
+  const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+  const fields = [
+    ['author', authors.length ? `{${authors.join(' and ')}}` : `{{${bibEsc(SITE.name)}}}`],
+    ['title', `{{${bibEsc(plain(p.title))}}}`],
+    ['howpublished', `{${bibEsc(SITE.name)}: ${bibEsc(SITE.subtitle)}, Problem ${p.number}}`],
+    ['year', `{${posed.slice(0, 4)}}`],
+    ['month', months[Number(posed.slice(5, 7)) - 1] || `{}`],
+    ['date', `{${posed}}`],
+    ['url', `{${url}}`],
+    ['urldate', `{${todayIso()}}`],
+    ['note', `{Problem posed ${fmtDate(posed)}; status: ${statusInfo(p.status).label}, last updated ${fmtDate(updatedOf(p))}}`]
+  ];
+  return `@misc{${slug(SITE.name)}-problem-${p.number},\n${fields.map(([k, v]) => `  ${k.padEnd(12)} = ${v}`).join(',\n')}\n}`;
+}
 const problemLabel = p => `Problem ${p.number}`;
 /* What an entry under revision displays, as the paper asks: the date of the claim and the number of independent
    verifications and explanatory expositions received since. The claim is the newest one recorded in the current status
@@ -161,6 +183,7 @@ function problemTemplate() {
   goals: ["classicality"],   // classicality, framework, applications (one or more)
   topics: ["Topic one", "Topic two"],
   posedBy: ["Your Name (Institution)"],
+  revisedBy: [],
   curatedBy: [],
   ai: "none",                // none, partial, full: how much AI assistance went into posing it
   statement: tex\`Precise statement. Inline math between \\( and \\),
@@ -225,7 +248,7 @@ function buildEntry(type, f, meta) {
   const lines = s => String(s || '').split('\n').map(x => x.trim()).filter(Boolean);
   const text = sanitizeMarkup;
   if (type === 'problem') return {
-    number: meta.number, title: f.title, status: 'open', goals: list(f.goals), topics: list(f.topics), posedBy: by, curatedBy: [], ai,
+    number: meta.number, title: f.title, status: 'open', goals: list(f.goals), topics: list(f.topics), posedBy: by, revisedBy: [], curatedBy: [], ai,
     statement: text(f.statement), background: text(f.background), relevance: text(f.relevance), significance: text(f.significance),
     history: [{ date, kind: 'posed', text: 'Problem posed through the site.', by }],
     references: lines(f.references).map(l => { const i = l.indexOf('|'); return i < 0 ? { text: l, url: '' } : { text: l.slice(0, i).trim(), url: webUrl(l.slice(i + 1).trim()) }; })

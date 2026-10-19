@@ -33,7 +33,7 @@ function viewAbout() {
   <p>Four indicators will be reported. Volume and quality: the fraction of submitted partial results that are consolidated through the revision process before appearing as preprints, as opposed to being posted directly. Attribution: whether manuscripts that resolve listed problems cite the database and the problem posers. Participation: the number and institutional spread of contributors, in particular contributions from researchers without ready access to frontier models. Acceleration: time-to-resolution for each problem, compared with the community's own sense of how long such problems have typically taken. At the end of the year the proposal as a whole, its problem list, its database, and its coordination mechanisms will be reassessed in a community-facing white paper reporting what progress was made, what methods proved effective, which parts of the methodology require revision, and which open problems remain, with negative outcomes reported as carefully as positive ones.</p>
 
   <h2 class="sec-title">F. How to cite</h2>
-  <p>Every problem page ends with a ready-made citation carrying the problem number, its status, and the date it was last updated. To cite the database as a whole, and the paper that describes it:</p>
+  <p>Every problem page ends with a ready-made BibTeX entry carrying the problem’s title, the people who posed it, the address of its page, the date it was proposed, its status, and the date it was last updated. To cite the database as a whole, and the paper that describes it:</p>
   <pre class="cite">${esc(dbCite)}${paperCite ? '\n' + esc(paperCite) : ''}</pre>
 
   <h2 class="sec-title" id="people">G. Moderators and contributors</h2>
