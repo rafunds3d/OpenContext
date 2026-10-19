@@ -15,7 +15,7 @@ MAIL_FROM = "OpenContext <rafael.wagner@uni-ulm.de>"     # the verified sender
 EXTRA_DOMAINS = "perimeterinstitute.ca,oeaw.ac.at,iqoqi-vienna.at,mpg.de,cnrs.fr,cern.ch,ictp.it,icfo.eu,inl.int,ist.ac.at,ucl.ac.uk,cwi.nl,weizmann.ac.il"
 # The moderators, who can sign in on the site (Moderators link in the footer) to edit entries and accept submissions:
 # "Name <address>" entries separated by commas, or bare addresses. The name goes on the commits they make.
-MODERATOR_EMAILS = "Rafael Wagner <rafael.wagner@uni-ulm.de>"
+MODERATOR_EMAILS = "Rafael Wagner <rafael.wagner@uni-ulm.de>, John H. Selby <john.h.selby@gmail.com>"
 # What a moderator's save becomes: "direct" commits to GITHUB_BASE at once (the site redeploys in a minute or two);
 # "pull-request" opens a pull request for another moderator to merge. Use "pull-request" if the branch is protected.
 EDIT_MODE = "direct"
