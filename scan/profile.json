@@ -1,0 +1,32 @@
+{
+  "_comment": "What the preprint scan looks for. Everything else (statements, backgrounds, references, dates) is read from data/problems.js and data/site.js. Phrases are matched case-insensitively on title + abstract (and on the full text when it is fetched); hyphens and spaces are interchangeable. A paper is a candidate for a problem when it hits at least one 'topic' phrase AND at least one 'angle' phrase, or when its text similarity to the problem entry reaches 'similarityThreshold'. 'topic' is the problem's subject matter, which other people legitimately work on; 'angle' is what OpenContext's question adds to it. Overlap on the topic alone is ordinary science and is never reported.",
+
+  "arxivCategories": ["quant-ph"],
+  "hexagonCategories": ["quant-ph"],
+  "lookbackDays": 5,
+  "similarityThreshold": 0.22,
+  "maxFullText": 25,
+
+  "acknowledgements": [
+    "opencontext",
+    "rafunds3d.github.io",
+    "github.com/rafunds3d",
+    "skilled humans collaborating with ai agents",
+    "case study in quantum foundations"
+  ],
+
+  "problems": {
+    "1": {
+      "topic": ["wigner entropy", "wigner positive", "wigner positivity", "wigner nonnegative", "wigner non negative", "nonnegative wigner function", "non negative wigner function", "positive wigner function", "wigner entropy conjecture", "entropy of the wigner function", "wigner majorization", "below the vacuum"],
+      "angle": ["noncontextual", "noncontextuality", "contextuality", "contextual", "prepare and measure", "epistemic restriction", "entropic uncertainty"]
+    },
+    "2": {
+      "topic": ["quantum switch", "indefinite causal order", "indefinite causality", "causal nonseparab", "superposition of causal orders", "superposition of orders", "higher order operation", "quantum supermap"],
+      "angle": ["generalized noncontextual", "generalised noncontextual", "noncontextual model", "noncontextual ontological model", "generalized contextuality", "generalised contextuality", "preparation contextuality", "epistemically restricted", "epistemic restriction", "spekkens toy", "ontological model"]
+    },
+    "3": {
+      "topic": ["sample complexity", "number of copies", "finite statistics", "finite data", "finite sample", "copy complexity", "entanglement certification", "certify entanglement", "certifying entanglement", "self consistent tomography", "gate set tomography", "theory agnostic tomography"],
+      "angle": ["self consistent entanglement certification", "noncontextuality inequalit", "generalized noncontextuality", "generalised noncontextuality", "generalized contextuality", "generalised contextuality", "operational identities", "operational equivalences", "uncharacterized local devices", "uncharacterised local devices"]
+    }
+  }
+}
