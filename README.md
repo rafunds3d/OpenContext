@@ -24,6 +24,7 @@ pages/moderate.js        the moderators' pages: sign-in, the queue of submission
 js/lib.js              shared pieces: apples, status labels, rows, the red and tan boxes, templates, the submission format
 js/router.js           turns #/problems, #/problem/3, … into calls of the page functions; loaded last
 submit/                the service: a Cloudflare Worker that turns a submission into a pull request and lets moderators edit on the site (see below)
+scan/                  the daily preprint scan: e-mails the moderators new quant-ph preprints that may draw on an entry without citing it (see scan/README.md)
 ```
 
 ## Editing

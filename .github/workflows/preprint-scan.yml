@@ -1,0 +1,117 @@
+# Daily scan of new quant-ph preprints (arXiv and Hexagon) for papers that draw on an OpenContext problem without
+# acknowledging it. Candidates are e-mailed to the moderators; nothing about them is written to the repository, its
+# issues or the run's log, since this repository is public. Setup and limits: scan/README.md.
+name: Preprint scan
+
+on:
+  schedule:
+    - cron: "30 6 * * *"          # 06:30 UTC, after arXiv's nightly announcement
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "Window in days (default: lookbackDays in scan/profile.json)"
+        required: false
+      ids:
+        description: "Score these preprints instead, e.g. 2609.13312,hexagon:2609.00126"
+        required: false
+  pull_request:
+    paths: ["scan/**", ".github/workflows/preprint-scan.yml"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: preprint-scan-${{ github.event_name }}
+  cancel-in-progress: false
+
+jobs:
+  # On a pull request: the offline checks, then a live run against arXiv and Hexagon that only prints counts and the
+  # scores of a few papers the entries already cite, to see the endpoints and the thresholds at work.
+  check:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node scan/test.mjs
+      - name: Live run (counts only)
+        run: node scan/scan.mjs --days 3 --out /tmp/scan-out --state /tmp/seen.json
+      - name: Calibration on papers the entries cite
+        run: node scan/scan.mjs --ids 2609.13312,2609.23277,2609.24670,2307.02565,2507.01122 --no-fulltext --out /tmp/cal-out
+
+  scan:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+
+      # the ids already scanned, carried from run to run
+      - uses: actions/cache@v4
+        with:
+          path: .scan-state
+          key: preprint-scan-state-${{ github.run_id }}
+          restore-keys: preprint-scan-state-
+
+      - name: Scan
+        id: scan
+        env:
+          DAYS: ${{ inputs.days }}
+          IDS: ${{ inputs.ids }}
+        run: |
+          set -- --out scan-out
+          if [ -n "$DAYS" ]; then set -- "$@" --days "$DAYS"; fi
+          if [ -n "$IDS" ]; then set -- "$@" --ids "$IDS"; fi
+          node scan/scan.mjs "$@"
+
+      - name: Decide what to send
+        id: mail
+        env:
+          CANDIDATES: ${{ steps.scan.outputs.candidates }}
+          STRONG: ${{ steps.scan.outputs.strong }}
+          ACKNOWLEDGED: ${{ steps.scan.outputs.acknowledged }}
+          HAS_SMTP: ${{ secrets.SMTP_SERVER != '' && secrets.SMTP_USERNAME != '' && secrets.SMTP_PASSWORD != '' }}
+        run: |
+          if [ "${CANDIDATES:-0}" != "0" ]; then
+            echo "subject=OpenContext preprint scan: ${CANDIDATES} candidate(s), ${STRONG:-0} strong" >> "$GITHUB_OUTPUT"
+          elif [ "${ACKNOWLEDGED:-0}" != "0" ]; then
+            echo "subject=OpenContext preprint scan: ${ACKNOWLEDGED} preprint(s) acknowledge OpenContext" >> "$GITHUB_OUTPUT"
+          else
+            echo "Nothing to report today."; exit 0
+          fi
+          echo "send=true" >> "$GITHUB_OUTPUT"
+          echo "smtp=${HAS_SMTP}" >> "$GITHUB_OUTPUT"
+
+      - name: E-mail the report
+        if: steps.mail.outputs.send == 'true' && steps.mail.outputs.smtp == 'true'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT || 465 }}
+          secure: ${{ (secrets.SMTP_PORT || '465') == '465' }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          from: ${{ secrets.SMTP_FROM || secrets.SMTP_USERNAME }}
+          to: ${{ vars.SCAN_EMAIL_TO || 'rafael.wagner@uni-ulm.de' }}
+          subject: ${{ steps.mail.outputs.subject }}
+          body: file://scan-out/report.md
+          convert_markdown: true
+          attachments: scan-out/report.md,scan-out/candidates.json
+
+      # Without mail settings the report is kept with the run for a week and the run fails, so that GitHub's own
+      # notice of a failed run reaches the repository's owner.
+      - name: Keep the report (no mail settings)
+        if: steps.mail.outputs.send == 'true' && steps.mail.outputs.smtp != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: preprint-scan-report
+          path: scan-out/
+          retention-days: 7
+      - name: Ask for mail settings
+        if: steps.mail.outputs.send == 'true' && steps.mail.outputs.smtp != 'true'
+        run: |
+          echo "::error::The scan has something to report, but the SMTP_SERVER, SMTP_USERNAME and SMTP_PASSWORD secrets are not set, so it could not be e-mailed. The report is attached to this run for 7 days. See scan/README.md."
+          exit 1
